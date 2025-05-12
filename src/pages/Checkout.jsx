@@ -9,7 +9,7 @@ import emailjs from '@emailjs/browser';
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const [orderMethod, setOrderMethod] = useState("normal");
+  const [orderMethod, setOrderMethod] = useState("whatsapp");
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -358,74 +358,21 @@ const Checkout = () => {
               <span>KSh {total.toLocaleString()}</span>
             </div>
           </div>
-
-          <div className="shipping-info">
-            <h2>Shipping Information</h2>
-            <div className="form-row">
-              <input
-                type="text"
-                name="fullName"
-                placeholder="Full Name"
-                value={formData.fullName}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="form-row">
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={formData.email}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="form-row">
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Phone Number"
-                value={formData.phone}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="form-row">
-              <input
-                type="text"
-                name="address"
-                placeholder="Delivery Address"
-                value={formData.address}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="form-row double">
-              <input
-                type="text"
-                name="city"
-                placeholder="City"
-                value={formData.city}
-                onChange={handleInputChange}
-              />
-              <input
-                type="text"
-                name="postalCode"
-                placeholder="Postal Code"
-                value={formData.postalCode}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="form-row">
-              <textarea
-                name="deliveryNotes"
-                placeholder="Delivery Notes (Optional)"
-                value={formData.deliveryNotes}
-                onChange={handleInputChange}
-              ></textarea>
-            </div>
-          </div>
-
           <div className="order-method">
             <h2>How would you like to place your order?</h2>
             <div className="order-options">
+              <div
+                className={`order-option ${orderMethod === 'whatsapp' ? 'selected' : ''}`}
+                onClick={() => setOrderMethod('whatsapp')}
+              >
+                <div className="option-radio">
+                  {orderMethod === 'whatsapp' && <div className="radio-inner"></div>}
+                </div>
+                <div className="option-label">
+                  <span>WhatsApp Order</span>
+                  <small>Place your order via WhatsApp for direct communication</small>
+                </div>
+              </div>
               <div
                 className={`order-option ${orderMethod === 'normal' ? 'selected' : ''}`}
                 onClick={() => setOrderMethod('normal')}
@@ -439,18 +386,6 @@ const Checkout = () => {
                 </div>
               </div>
 
-              <div
-                className={`order-option ${orderMethod === 'whatsapp' ? 'selected' : ''}`}
-                onClick={() => setOrderMethod('whatsapp')}
-              >
-                <div className="option-radio">
-                  {orderMethod === 'whatsapp' && <div className="radio-inner"></div>}
-                </div>
-                <div className="option-label">
-                  <span>WhatsApp Order</span>
-                  <small>Place your order via WhatsApp for direct communication</small>
-                </div>
-              </div>
             </div>
 
             {orderMethod === 'whatsapp' && (
@@ -462,6 +397,47 @@ const Checkout = () => {
               </div>
             )}
           </div>
+
+         {orderMethod === 'normal' && (
+  <div className="shipping-info">
+    <h2>Contact Information</h2>
+    <div className="form-row">
+      <input
+        type="text"
+        name="fullName"
+        placeholder="Full Name"
+        value={formData.fullName}
+        onChange={handleInputChange}
+      />
+    </div>
+    <div className="form-row">
+      <input
+        type="email"
+        name="email"
+        placeholder="Email Address"
+        value={formData.email}
+        onChange={handleInputChange}
+      />
+    </div>
+    <div className="form-row">
+      <input
+        type="tel"
+        name="phone"
+        placeholder="Phone Number"
+        value={formData.phone}
+        onChange={handleInputChange}
+      />
+    </div>
+    <div className="form-row">
+      <textarea
+        name="deliveryNotes"
+        placeholder="Any Special Instructions (Optional)"
+        value={formData.deliveryNotes}
+        onChange={handleInputChange}
+      ></textarea>
+    </div>
+  </div>
+)}
 
           <button
             className="checkout-button"

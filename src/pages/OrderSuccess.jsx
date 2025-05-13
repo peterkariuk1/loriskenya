@@ -191,11 +191,11 @@ const OrderSuccess = () => {
                 <strong>Email:</strong> loriskenyaltd@gmail.com
               </p>
               <p>
-                <strong>Phone:</strong> +254 712 345 678
+                <strong>Phone:</strong> +254753380900
               </p>
               {orderMethod === 'whatsapp' && (
                 <p>
-                  <strong>WhatsApp:</strong> +254 712 345 678
+                  <strong>WhatsApp:</strong> +254753380900
                 </p>
               )}
             </div>

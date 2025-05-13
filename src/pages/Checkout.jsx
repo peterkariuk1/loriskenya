@@ -9,14 +9,11 @@ import emailjs from '@emailjs/browser';
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const [orderMethod, setOrderMethod] = useState("whatsapp");
+  const [orderMethod, setOrderMethod] = useState("normal");
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     phone: "",
-    address: "",
-    city: "",
-    postalCode: "",
     deliveryNotes: ""
   });
   const [isProcessing, setIsProcessing] = useState(false);
@@ -27,10 +24,8 @@ const Checkout = () => {
   const EMAILJS_TEMPLATE_ID = "template_n8yvs08";
   const EMAILJS_USER_ID = "v5NvpmkGpBwe7W6nZ";
 
-  const subtotal = cartItems.reduce((total, item) => total + (item.price ? item.price * item.quantity : item.selling_price * item.quantity), 0);
-  const shipping = subtotal > 5000 ? 0 : 100;
-  const tax = subtotal * 0.16;
-  const total = subtotal + shipping + tax;
+  // Calculate the total without separate tax and shipping
+  const total = cartItems.reduce((total, item) => total + (item.price ? item.price * item.quantity : item.selling_price * item.quantity), 0);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -50,9 +45,8 @@ const Checkout = () => {
         price: item.price.toLocaleString()
       }));
 
+      // Simplified costs without tax and shipping
       const formattedCosts = {
-        shipping: orderData.shipping === 0 ? "Free" : orderData.shipping.toLocaleString(),
-        tax: orderData.tax.toLocaleString(),
         total: orderData.total.toLocaleString()
       };
 
@@ -101,17 +95,11 @@ const Checkout = () => {
           category: item.category || 'Uncategorized',
           image: item.image || ''
         })),
-        subtotal,
-        shipping,
-        tax,
         total,
         status: "pending",
         orderMethod: "website",
         shippingAddress: {
           fullName: formData.fullName,
-          address: formData.address,
-          city: formData.city,
-          postalCode: formData.postalCode,
           phone: formData.phone,
           email: formData.email,
           notes: formData.deliveryNotes
@@ -152,87 +140,21 @@ const Checkout = () => {
     });
 
     message += `\n*Order Summary*\n`;
-    message += `Subtotal: KSh ${subtotal}\n`;
-    message += `Shipping: ${shipping === 0 ? 'Free' : `KSh ${shipping}`}\n`;
-    message += `Tax: KSh ${tax}\n`;
     message += `Total: KSh ${total}\n\n`;
 
-    message += `*Delivery Information*\n`;
-    message += `Name: ${formData.fullName}\n`;
-    message += `Phone: ${formData.phone}\n`;
-    message += `Email: ${formData.email}\n`;
-    message += `Address: ${formData.address}\n`;
-    message += `City: ${formData.city}\n`;
-    message += formData.postalCode ? `Postal Code: ${formData.postalCode}\n` : '';
-    message += formData.deliveryNotes ? `Notes: ${formData.deliveryNotes}\n` : ''; 
-    // WhatsApp business number - replace with the actual business number
-    const whatsappNumber = "254753380900"; // Replace with the actual number
+    const whatsappNumber = "254753380900";
     const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-    const saveOrderAndOpenWhatsApp = async () => {
-      try {
-        const user = auth.currentUser;
-
-        const orderData = {
-          id: orderId,
-          userId: user ? user.uid : 'guest',
-          userEmail: user ? user.email : formData.email,
-          items: cartItems.map(item => ({
-            id: item.id,
-            name: item.name,
-            price: item.price || item.selling_price,
-            quantity: item.quantity,
-            category: item.category || 'Uncategorized',
-            image: item.image || ''
-          })),
-          subtotal,
-          shipping,
-          tax,
-          total,
-          status: "pending",
-          orderMethod: "whatsapp",
-          shippingAddress: {
-            fullName: formData.fullName,
-            address: formData.address,
-            city: formData.city,
-            postalCode: formData.postalCode,
-            phone: formData.phone,
-            email: formData.email,
-            notes: formData.deliveryNotes
-          },
-          createdAt: new Date(),
-          updatedAt: new Date()
-        };
-
-        if (user) {
-          await setDoc(doc(db, "users", user.uid, "orders", orderId), orderData);
-        }
-
-        await setDoc(doc(db, "orders", orderId), {
-          ...orderData,
-          userDisplayName: user ? user.displayName || '' : formData.fullName
-        });
-
-        await sendOrderConfirmationEmail(orderData);
-
-        clearCart();
-
-        window.open(whatsappURL, '_blank');
-
-        navigate(`/order-success?orderId=${orderId}&via=whatsapp`);
-      } catch (error) {
-        console.error("Error saving WhatsApp order:", error);
-        alert("We encountered an error processing your order. You can still continue to WhatsApp.");
-        window.open(whatsappURL, '_blank');
-        setIsProcessing(false);
-      }
+    const OpenWhatsApp = async () => {
+      clearCart();
+      window.open(whatsappURL, '_blank');
     };
 
-    saveOrderAndOpenWhatsApp();
+    OpenWhatsApp();
   };
 
   const handleCheckout = () => {
-    if (!formData.fullName || !formData.email || !formData.phone || !formData.address) {
+    if (!formData.fullName || !formData.email || !formData.phone) {
       alert("Please fill in all required fields");
       return;
     }
@@ -261,10 +183,7 @@ const Checkout = () => {
                 `${userData.firstName} ${userData.lastName}` :
                 prev.fullName,
               email: user.email || prev.email,
-              phone: userData.phone || prev.phone,
-              address: userData.address?.street || prev.address,
-              city: userData.address?.city || prev.city,
-              postalCode: userData.address?.postalCode || prev.postalCode
+              phone: userData.phone || prev.phone
             }));
           }
         } catch (error) {
@@ -341,38 +260,56 @@ const Checkout = () => {
         <div className="checkout-section">
           <div className="order-summary">
             <h2>Order Summary</h2>
-            <div className="summary-row">
-              <span>Subtotal</span>
-              <span>KSh {subtotal.toLocaleString()}</span>
-            </div>
-            <div className="summary-row">
-              <span>Shipping</span>
-              <span>{shipping === 0 ? 'Free' : `KSh ${shipping.toLocaleString()}`}</span>
-            </div>
-            <div className="summary-row">
-              <span>Tax (16%)</span>
-              <span>KSh {tax.toLocaleString()}</span>
-            </div>
+            {/* Remove tax and shipping rows, keep only the total */}
             <div className="summary-row total">
               <span>Total</span>
               <span>KSh {total.toLocaleString()}</span>
             </div>
+            <p className="included-info">Prices are inclusive of taxes</p>
           </div>
+
+          <div className="shipping-info">
+            <h2>Contact Information</h2>
+            <div className="form-row">
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Full Name"
+                value={formData.fullName}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="form-row">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={formData.email}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="form-row">
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Phone Number"
+                value={formData.phone}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="form-row">
+              <textarea
+                name="deliveryNotes"
+                placeholder="Any Special Instructions (Optional)"
+                value={formData.deliveryNotes}
+                onChange={handleInputChange}
+              ></textarea>
+            </div>
+          </div>
+
           <div className="order-method">
             <h2>How would you like to place your order?</h2>
             <div className="order-options">
-              <div
-                className={`order-option ${orderMethod === 'whatsapp' ? 'selected' : ''}`}
-                onClick={() => setOrderMethod('whatsapp')}
-              >
-                <div className="option-radio">
-                  {orderMethod === 'whatsapp' && <div className="radio-inner"></div>}
-                </div>
-                <div className="option-label">
-                  <span>WhatsApp Order</span>
-                  <small>Place your order via WhatsApp for direct communication</small>
-                </div>
-              </div>
               <div
                 className={`order-option ${orderMethod === 'normal' ? 'selected' : ''}`}
                 onClick={() => setOrderMethod('normal')}
@@ -386,6 +323,18 @@ const Checkout = () => {
                 </div>
               </div>
 
+              <div
+                className={`order-option ${orderMethod === 'whatsapp' ? 'selected' : ''}`}
+                onClick={() => setOrderMethod('whatsapp')}
+              >
+                <div className="option-radio">
+                  {orderMethod === 'whatsapp' && <div className="radio-inner"></div>}
+                </div>
+                <div className="option-label">
+                  <span>WhatsApp Order</span>
+                  <small>Place your order via WhatsApp for direct communication</small>
+                </div>
+              </div>
             </div>
 
             {orderMethod === 'whatsapp' && (
@@ -397,47 +346,6 @@ const Checkout = () => {
               </div>
             )}
           </div>
-
-         {orderMethod === 'normal' && (
-  <div className="shipping-info">
-    <h2>Contact Information</h2>
-    <div className="form-row">
-      <input
-        type="text"
-        name="fullName"
-        placeholder="Full Name"
-        value={formData.fullName}
-        onChange={handleInputChange}
-      />
-    </div>
-    <div className="form-row">
-      <input
-        type="email"
-        name="email"
-        placeholder="Email Address"
-        value={formData.email}
-        onChange={handleInputChange}
-      />
-    </div>
-    <div className="form-row">
-      <input
-        type="tel"
-        name="phone"
-        placeholder="Phone Number"
-        value={formData.phone}
-        onChange={handleInputChange}
-      />
-    </div>
-    <div className="form-row">
-      <textarea
-        name="deliveryNotes"
-        placeholder="Any Special Instructions (Optional)"
-        value={formData.deliveryNotes}
-        onChange={handleInputChange}
-      ></textarea>
-    </div>
-  </div>
-)}
 
           <button
             className="checkout-button"

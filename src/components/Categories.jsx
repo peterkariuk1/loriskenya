@@ -6,7 +6,6 @@ import frequencesImage from "../assets/lorisfrequence.png";
 import nicheImage from "../assets/lorisniche.jpeg";
 import bodyCareImage from "../assets/lorisbodycare.webp";
 import perfumeImage from "../assets/oudperfume.jpeg";
-// import cologneImage from "../assets/loriscologne.jpg";
 import autoPerfumeImage from "../assets/lorisaautoperfume.jpg";
 import ladiesImage from "../assets/womanperfume.jpeg";
 import menImage from "../assets/manperfume.jpeg";
@@ -59,24 +58,6 @@ function Categories() {
     // Updated to handle category selection for men/women
     const handleCategoryClick = (categoryName) => {
         setSelectedCategory(categoryName);
-        
-        // Handles scroll to sections for Men and Ladies perfumes
-        if (categoryName === "Men") {
-            // Scroll to men section
-            const menSection = document.getElementById('men');
-            if (menSection) {
-                menSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                return;
-            }
-        } 
-        else if (categoryName === "Women") {
-            // Scroll to women section
-            const womenSection = document.getElementById('women');
-            if (womenSection) {
-                womenSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                return;
-            }
-        }
         
         // For all other categories, navigate to all-products
         const queryParams = new URLSearchParams();

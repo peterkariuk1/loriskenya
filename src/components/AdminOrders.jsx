@@ -492,29 +492,7 @@ const AdminOrders = () => {
                                   "Not provided"}
                               </p>
                             </div>
-                            
-                            <div className="details-section shipping-details">
-                              <h4>Shipping Details</h4>
-                              <p>
-                                <MdLocationOn className="details-icon" />
-                                <span>Address:</span> 
-                                {order.shippingAddress?.address ? 
-                                  `${order.shippingAddress.address}${order.shippingAddress.city ? `, ${order.shippingAddress.city}` : ''}${order.shippingAddress.postalCode ? ` - ${order.shippingAddress.postalCode}` : ''}` : 
-                                  "Not provided"}
-                              </p>
-                              {order.shippingAddress?.deliveryNotes && (
-                                <p>
-                                  <span>Notes:</span> {order.shippingAddress.deliveryNotes}
-                                </p>
-                              )}
-                            </div>
-                            
-                            <div className="details-section payment-details">
-                              <h4>Payment Details</h4>
-                              <p><span>Method:</span> {order.paymentMethod || "Unknown"}</p>
-                              <p><span>Status:</span> {order.paymentStatus || "Paid"}</p>
-                              {order.mpesaCode && <p><span>M-PESA Code:</span> {order.mpesaCode}</p>}
-                            </div>
+
                           </div>
                           
                           <div className="order-items-table">

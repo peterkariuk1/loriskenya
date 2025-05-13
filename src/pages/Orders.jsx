@@ -5,6 +5,7 @@ import { auth, db } from "../../firebase/firebaseConfig";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import Header from "../components/Header";
+import { useCart } from "../context/CartContext"; // Import the cart context
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -12,7 +13,11 @@ const Orders = () => {
   const [authLoading, setAuthLoading] = useState(true);
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
+  const [reorderSuccess, setReorderSuccess] = useState(null); // State for success message
   const navigate = useNavigate();
+  
+  // Get cart functions
+  const { addToCart } = useCart();
   
   // First, handle the auth state
   useEffect(() => {
@@ -91,6 +96,28 @@ const Orders = () => {
     return `KSh ${parseFloat(price).toLocaleString()}`;
   };
   
+  // Handle reordering
+  const handleReorder = (order) => {
+    // Add each item from the order to the cart
+    order.items.forEach(item => {
+      addToCart({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        category: item.category,
+        image: item.image,
+      }, item.quantity);
+    });
+    
+    // Show success message
+    setReorderSuccess(`Items from Order #${order.id} added to your cart`);
+    
+    // Hide success message after 3 seconds
+    setTimeout(() => {
+      setReorderSuccess(null);
+    }, 3000);
+  };
+  
   // Show auth loading state
   if (authLoading) {
     return (
@@ -112,6 +139,16 @@ const Orders = () => {
           <h1>My Orders</h1>
           <Link to="/" className="back-to-shopping">Continue Shopping</Link>
         </div>
+        
+        {/* Show reorder success notification if exists */}
+        {reorderSuccess && (
+          <div className="reorder-success">
+            <div className="success-icon">✓</div>
+            <div className="success-message">{reorderSuccess}</div>
+            <Link to="/cart" className="view-cart-btn">View Cart</Link>
+            <button className="close-notification" onClick={() => setReorderSuccess(null)}>×</button>
+          </div>
+        )}
         
         {loading ? (
           <div className="loading-orders">Loading your orders...</div>
@@ -165,18 +202,6 @@ const Orders = () => {
                 
                 <div className="order-footer">
                   <div className="order-summary">
-                    <div className="summary-row">
-                      <span>Subtotal:</span>
-                      <span>{formatPrice(order.subtotal)}</span>
-                    </div>
-                    <div className="summary-row">
-                      <span>Shipping:</span>
-                      <span>{order.shipping === 0 ? 'Free' : formatPrice(order.shipping)}</span>
-                    </div>
-                    <div className="summary-row">
-                      <span>Tax:</span>
-                      <span>{formatPrice(order.tax)}</span>
-                    </div>
                     <div className="summary-row total">
                       <span>Total:</span>
                       <span>{formatPrice(order.total)}</span>
@@ -184,8 +209,11 @@ const Orders = () => {
                   </div>
                   
                   <div className="order-actions">
-                    <button className="reorder-btn" onClick={() => alert('Reorder functionality coming soon!')}>
-                      Reorder
+                    <button 
+                      className="reorder-btn" 
+                      onClick={() => handleReorder(order)}
+                    >
+                      Add to Cart
                     </button>
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../styles/admin.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase/firebaseConfig";
 import { signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -179,7 +179,9 @@ const Admin = () => {
         {/* Sidebar Header */}
         <div className="sidebar-header">
           <div className="logo-container">
-            <img src={logoImage} alt="Loris Kenya" className="sidebar-logo" />
+            <Link to="/">
+              <img src={logoImage} alt="Loris Kenya" className="sidebar-logo" />
+            </Link>
             <h1 className="logo">Admin</h1>
           </div>
 

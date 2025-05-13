@@ -14,12 +14,7 @@ const Profile = () => {
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
-    address: {
-      street: '',
-      city: '',
-      postalCode: ''
-    }
+    phone: ''
   });
   
   // State for password change
@@ -51,12 +46,7 @@ const Profile = () => {
               firstName: data.firstName || '',
               lastName: data.lastName || '',
               email: currentUser.email || '',
-              phone: data.phone || '',
-              address: data.address || {
-                street: '',
-                city: '',
-                postalCode: ''
-              }
+              phone: data.phone || ''
             });
           }
         }
@@ -73,23 +63,11 @@ const Profile = () => {
   
   // Handle form input changes
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    
-    if (name.startsWith('address.')) {
-      const addressField = name.split('.')[1];
-      setUserData({
-        ...userData,
-        address: {
-          ...userData.address,
-          [addressField]: value
-        }
-      });
-    } else {
+    const { name, value } = e.target;   
       setUserData({
         ...userData,
         [name]: value
       });
-    }
   };
   
   // Handle password input changes
@@ -107,14 +85,7 @@ const Profile = () => {
     setUpdating(true);
     setError(null);
     setSuccess(null);
-    
-    // Ensure address is properly structured
-    const addressToSave = {
-      street: userData.address?.street || '',
-      city: userData.address?.city || '',
-      postalCode: userData.address?.postalCode || ''
-    };
-    
+
     try {
       const currentUser = auth.currentUser;
       
@@ -123,7 +94,6 @@ const Profile = () => {
         firstName: userData.firstName,
         lastName: userData.lastName,
         phone: userData.phone,
-        address: addressToSave,
         updatedAt: new Date()
       });
       
@@ -286,46 +256,7 @@ const Profile = () => {
                 placeholder="e.g., 0712345678"
               />
             </div>
-            
-            <h3>Shipping Address</h3>
-            
-            <div className="form-group">
-              <label htmlFor="street">Delivery Address</label>
-              <input
-                type="text"
-                id="street"
-                name="address.street"
-                value={userData.address.street}
-                onChange={handleChange}
-                disabled={!editMode}
-              />
-            </div>
-            
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="city">City</label>
-                <input
-                  type="text"
-                  id="city"
-                  name="address.city"
-                  value={userData.address.city}
-                  onChange={handleChange}
-                  disabled={!editMode}
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="postalCode">Postal Code</label>
-                <input
-                  type="text"
-                  id="postalCode"
-                  name="address.postalCode"
-                  value={userData.address.postalCode}
-                  onChange={handleChange}
-                  disabled={!editMode}
-                />
-              </div>
-            </div>
+
             {editMode && (
               <div className="form-actions">
                 <button 

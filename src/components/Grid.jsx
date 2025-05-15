@@ -427,9 +427,17 @@ const Grid = () => {
       </h2>
 
       {loading ? (
-        <div className="loading-container">
-          <p>Loading products...</p>
+        <section className="paginated-grid-section">
+        <div className="skeleton-grid">
+          {Array.from({ length: 24 }).map((_, i) => (
+            <div className="skeleton-card" key={i}>
+              <div className="skeleton-image" />
+              <div className="skeleton-text short" />
+              <div className="skeleton-text long" />
+            </div>
+          ))}
         </div>
+      </section>
       ) : products.length === 0 ? (
         <div className="no-products">
           <p>No products found</p>

@@ -237,7 +237,15 @@ const BestSellerGrid = () => {
   if (loading) {
     return (
       <section className="paginated-grid-section">
-        <p className="loading-text">Loading best sellers...</p>
+        <div className="skeleton-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div className="skeleton-card" key={i}>
+              <div className="skeleton-image" />
+              <div className="skeleton-text short" />
+              <div className="skeleton-text long" />
+            </div>
+          ))}
+        </div>
       </section>
     );
   }

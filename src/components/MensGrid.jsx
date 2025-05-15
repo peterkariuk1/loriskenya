@@ -20,14 +20,14 @@ const MenPerfumes = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  
+
   // Notification state
   const [notification, setNotification] = useState({
     visible: false,
-    message: '',
-    product: null
+    message: "",
+    product: null,
   });
-  
+
   const { addToCart } = useCart();
 
   // Fetch men's products from Firestore
@@ -35,36 +35,38 @@ const MenPerfumes = () => {
     const fetchMenProducts = async () => {
       try {
         setLoading(true);
-        
+
         // Create a query against the "products" collection where gender is "men"
         const productsRef = collection(db, "products");
         const menQuery = query(productsRef, where("gender", "==", "men"));
-        
+
         const querySnapshot = await getDocs(menQuery);
-        
+
         // Process and set products
-        const menProducts = querySnapshot.docs.map(doc => ({
+        const menProducts = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         }));
-        
+
         setProducts(menProducts);
         setVisibleProducts(menProducts.slice(0, visibleCount));
         setIsAllLoaded(visibleCount >= menProducts.length);
-        
+
         console.log("Total Men's Products:", menProducts.length);
-        console.log("Visible Men's Products Count:", Math.min(visibleCount, menProducts.length));
-        
+        console.log(
+          "Visible Men's Products Count:",
+          Math.min(visibleCount, menProducts.length)
+        );
       } catch (error) {
         console.error("Error fetching men's products:", error);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchMenProducts();
   }, []);
-  
+
   // Update visible products when visibleCount changes
   useEffect(() => {
     const slicedProducts = products.slice(0, visibleCount);
@@ -89,13 +91,13 @@ const MenPerfumes = () => {
   const showNotification = (product, qty = 1) => {
     setNotification({
       visible: true,
-      message: `Added ${qty} ${qty > 1 ? 'items' : 'item'} to cart`,
-      product: product
+      message: `Added ${qty} ${qty > 1 ? "items" : "item"} to cart`,
+      product: product,
     });
 
     // Hide notification after 3 seconds
     setTimeout(() => {
-      setNotification(prev => ({ ...prev, visible: false }));
+      setNotification((prev) => ({ ...prev, visible: false }));
     }, 3000);
   };
 
@@ -105,7 +107,7 @@ const MenPerfumes = () => {
     setQuantity(1); // Reset quantity when opening a new product
     setIsModalOpen(true);
     // Prevent scrolling on body when modal is open
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   };
 
   // Function to close modal
@@ -113,7 +115,7 @@ const MenPerfumes = () => {
     setIsModalOpen(false);
     setSelectedProduct(null);
     // Re-enable scrolling
-    document.body.style.overflow = 'auto';
+    document.body.style.overflow = "auto";
   };
 
   // Handle quantity change
@@ -146,13 +148,18 @@ const MenPerfumes = () => {
   // Share product function
   const handleShare = async (product) => {
     // Construct a shareable URL with the new format
-    const productUrl = `${window.location.origin}/product/?category=${encodeURIComponent(product.category || "Uncategorized")}&pid=${product.id}`;
-    
+    const productUrl = `${
+      window.location.origin
+    }/product/?category=${encodeURIComponent(
+      product.category || "Uncategorized"
+    )}&pid=${product.id}`;
+
     // Product details for sharing
     const title = capitalizeWords(product.name);
-    const text = product.description || 
-      `Check out this ${product.category || ''} perfume from Loris Kenya!`;
-    
+    const text =
+      product.description ||
+      `Check out this ${product.category || ""} perfume from Loris Kenya!`;
+
     // Check if the Web Share API is available
     if (navigator.share) {
       try {
@@ -161,41 +168,39 @@ const MenPerfumes = () => {
           text: text,
           url: productUrl,
         });
-        
+
         // Show a success notification
         setNotification({
           visible: true,
-          message: 'Product shared successfully!',
-          product: product
+          message: "Product shared successfully!",
+          product: product,
         });
-        
+
         setTimeout(() => {
-          setNotification(prev => ({ ...prev, visible: false }));
+          setNotification((prev) => ({ ...prev, visible: false }));
         }, 3000);
-        
       } catch (error) {
         // User cancelled or share failed
-        console.error('Share failed:', error);
+        console.error("Share failed:", error);
       }
     } else {
       // Fallback for browsers that don't support the Web Share API
       // Copy the product URL to clipboard
       try {
         await navigator.clipboard.writeText(productUrl);
-        
+
         setNotification({
           visible: true,
-          message: 'Link copied to clipboard!',
-          product: product
+          message: "Link copied to clipboard!",
+          product: product,
         });
-        
+
         setTimeout(() => {
-          setNotification(prev => ({ ...prev, visible: false }));
+          setNotification((prev) => ({ ...prev, visible: false }));
         }, 3000);
-        
       } catch (error) {
-        console.error('Clipboard copy failed:', error);
-        
+        console.error("Clipboard copy failed:", error);
+
         // Ultimate fallback: show the link in an alert
         alert(`Share this link: ${productUrl}`);
       }
@@ -204,7 +209,7 @@ const MenPerfumes = () => {
 
   // Format price as currency
   const formatPrice = (price) => {
-    if (price === undefined || price === null) return 'KSh 0';
+    if (price === undefined || price === null) return "KSh 0";
     return `KSh ${Number(price).toLocaleString()}`;
   };
 
@@ -222,9 +227,9 @@ const MenPerfumes = () => {
       product.photo;
 
     // Check if URL is valid
-    if (imageUrl && typeof imageUrl === 'string' && imageUrl.trim() !== '') {
+    if (imageUrl && typeof imageUrl === "string" && imageUrl.trim() !== "") {
       // If it's a relative path, convert to absolute URL
-      if (imageUrl.startsWith('/')) {
+      if (imageUrl.startsWith("/")) {
         return `https://pos.loriskenya.com${imageUrl}`;
       }
       // If it's already a full URL, use it
@@ -237,7 +242,15 @@ const MenPerfumes = () => {
   if (loading) {
     return (
       <section className="paginated-grid-section">
-        <p className="loading-text">Loading men's perfumes...</p>
+        <div className="skeleton-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div className="skeleton-card" key={i}>
+              <div className="skeleton-image" />
+              <div className="skeleton-text short" />
+              <div className="skeleton-text long" />
+            </div>
+          ))}
+        </div>
       </section>
     );
   }
@@ -252,12 +265,16 @@ const MenPerfumes = () => {
             <div className="notification-message">
               <strong>{notification.message}</strong>
               {notification.product && (
-                <span className="product-name">{notification.product.name}</span>
+                <span className="product-name">
+                  {notification.product.name}
+                </span>
               )}
             </div>
             <button
               className="notification-close"
-              onClick={() => setNotification(prev => ({ ...prev, visible: false }))}
+              onClick={() =>
+                setNotification((prev) => ({ ...prev, visible: false }))
+              }
             >
               ×
             </button>
@@ -266,24 +283,23 @@ const MenPerfumes = () => {
       )}
       <p className="generic-text">Confident, Crisp, Bold!</p>
       <h2 className="title-mini-grid">Men Best Sellers</h2>
-      
+
       {visibleProducts.length === 0 ? (
-        <p className="no-products-message">No men's perfumes available at the moment.</p>
+        <p className="no-products-message">
+          No men's perfumes available at the moment.
+        </p>
       ) : (
         <div className="grid-container">
           {visibleProducts.map((product) => (
             <div className="grid-item" key={product.id}>
               {/* Add out of stock overlay */}
               {product.inStock === false && (
-                  <div className="out-of-stock-overlay">
-                    <span>Out of Stock</span>
-                  </div>
-                )}
+                <div className="out-of-stock-overlay">
+                  <span>Out of Stock</span>
+                </div>
+              )}
               <div className="cart-options">
-                <div
-                  title="Share"
-                  onClick={() => handleShare(product)}
-                >
+                <div title="Share" onClick={() => handleShare(product)}>
                   <img className="share--icon" src={shareIcon} alt="Share" />
                 </div>
                 <div
@@ -322,27 +338,34 @@ const MenPerfumes = () => {
                 <img src={categoryIcon} alt="Category" />
                 {product.category || "Uncategorized"}
               </p>
-              
+
               {/* Add quantities display */}
               {product.quantities && product.quantities.length > 0 && (
                 <div className="grid-item-quantities">
                   {product.quantities.map((qty, index) => (
-                    <span key={index} className="quantity-chip">{qty}</span>
+                    <span key={index} className="quantity-chip">
+                      {qty}
+                    </span>
                   ))}
                 </div>
               )}
-              
+
               <p className="grid-item-price">{formatPrice(product.price)}</p>
             </div>
           ))}
         </div>
       )}
-      
+
       {/* Product Detail Modal */}
       {isModalOpen && selectedProduct && (
         <div className="product-modal-overlay" onClick={closeModal}>
-          <div className="product-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-btn" onClick={closeModal}>×</button>
+          <div
+            className="product-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="modal-close-btn" onClick={closeModal}>
+              ×
+            </button>
 
             <div className="product-modal-container">
               {/* Left Section - Product Image */}
@@ -359,41 +382,59 @@ const MenPerfumes = () => {
 
               {/* Right Section - Product Details */}
               <div className="product-modal-details">
-                <h2 className="product-modal-name">{capitalizeWords(selectedProduct.name)}</h2>
-                
+                <h2 className="product-modal-name">
+                  {capitalizeWords(selectedProduct.name)}
+                </h2>
+
                 <p className="product-modal-category">
                   <span className="category-label">Category: </span>
-                  {selectedProduct.category || 'Uncategorized'}
+                  {selectedProduct.category || "Uncategorized"}
                 </p>
-                
+
                 {/* Add quantities display in modal */}
-                {selectedProduct.quantities && selectedProduct.quantities.length > 0 && (
-                  <div className="product-modal-quantities">
-                    <h4>Available Sizes:</h4>
-                    <div className="quantities-list">
-                      {selectedProduct.quantities.map((qty, index) => (
-                        <span key={index} className="quantity-badge">{qty}</span>
-                      ))}
+                {selectedProduct.quantities &&
+                  selectedProduct.quantities.length > 0 && (
+                    <div className="product-modal-quantities">
+                      <h4>Available Sizes:</h4>
+                      <div className="quantities-list">
+                        {selectedProduct.quantities.map((qty, index) => (
+                          <span key={index} className="quantity-badge">
+                            {qty}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-                
+                  )}
+
                 {/* Share button */}
-                <button className="product-share-btn" onClick={() => handleShare(selectedProduct)}>
+                <button
+                  className="product-share-btn"
+                  onClick={() => handleShare(selectedProduct)}
+                >
                   <img src={shareIcon} alt="Share" />
                   Share
                 </button>
-                
+
                 <div className="product-modal-description">
-                  <p>{selectedProduct.description || 'No description available for this product.'}</p>
+                  <p>
+                    {selectedProduct.description ||
+                      "No description available for this product."}
+                  </p>
                 </div>
 
                 <div className="product-modal-quantity">
                   <span>Quantity:</span>
                   <div className="quantity-controls">
-                    <button onClick={() => updateQuantity(quantity - 1)} disabled={quantity <= 1}>-</button>
+                    <button
+                      onClick={() => updateQuantity(quantity - 1)}
+                      disabled={quantity <= 1}
+                    >
+                      -
+                    </button>
                     <span>{quantity}</span>
-                    <button onClick={() => updateQuantity(quantity + 1)}>+</button>
+                    <button onClick={() => updateQuantity(quantity + 1)}>
+                      +
+                    </button>
                   </div>
                 </div>
 
@@ -410,7 +451,7 @@ const MenPerfumes = () => {
           </div>
         </div>
       )}
-      
+
       {!isAllLoaded && visibleProducts.length > 0 && (
         <button className="view-collection-button" onClick={handleViewMore}>
           View Collection

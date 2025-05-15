@@ -16,6 +16,7 @@ import UpdateProducts from "../components/UpdateProducts";
 import Customers from "../components/Customers";
 import ListProducts from "../components/ListProducts";
 import Dashboard from "../components/Dashboard";
+import { Helmet } from 'react-helmet'
 
 const Admin = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -173,127 +174,139 @@ const Admin = () => {
 
   // Original Admin component render - only shown to admins
   return (
-    <div className={`admin-container ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-      {/* Sidebar */}
-      <aside className={`admin-sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
-        {/* Sidebar Header */}
-        <div className="sidebar-header">
-          <div className="logo-container">
-            <Link to="/">
-              <img src={logoImage} alt="Loris Kenya" className="sidebar-logo" />
-            </Link>
-            <h1 className="logo">Admin</h1>
+    <>
+      <Helmet>
+        <title>Loris | Admin</title>
+        <meta name="description" content="Admin dashboard for Loris Kenya" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" href={logoImage} />
+        <meta property="og:title" content="Loris Kenya Admin" />
+        <meta property="og:description" content="Admin dashboard for Loris Kenya" />
+        <meta property="og:image" content={logoImage} />
+        <meta property="og:url" content="https://www.loriskenya.com/admin" />
+      </Helmet>
+      <div className={`admin-container ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+        {/* Sidebar */}
+        <aside className={`admin-sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
+          {/* Sidebar Header */}
+          <div className="sidebar-header">
+            <div className="logo-container">
+              <Link to="/">
+                <img src={logoImage} alt="Loris Kenya" className="sidebar-logo" />
+              </Link>
+              <h1 className="logo">Admin</h1>
+            </div>
+
+            {/* Mobile close button */}
+            <button className="mobile-close-btn" onClick={toggleMobileMenu}>
+              <FiX size={24} />
+            </button>
+
+            {/* Desktop collapse button */}
+            <button className="collapse-btn" onClick={toggleSidebar}>
+              {sidebarCollapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}
+            </button>
           </div>
 
-          {/* Mobile close button */}
-          <button className="mobile-close-btn" onClick={toggleMobileMenu}>
-            <FiX size={24} />
-          </button>
+          {/* Navigation */}
+          <div className="sidebar-nav">
+            <ul>
+              <li className={activeTab === "dashboard" ? "active" : ""}>
+                <button onClick={() => handleTabChange("dashboard")}>
+                  <FiHome size={18} />
+                  <span>Dashboard</span>
+                </button>
+              </li>
+              <li className={activeTab === "orders" ? "active" : ""}>
+                <button onClick={() => handleTabChange("orders")}>
+                  <FiShoppingBag size={18} />
+                  <span>Orders</span>
+                </button>
+              </li>
 
-          {/* Desktop collapse button */}
-          <button className="collapse-btn" onClick={toggleSidebar}>
-            {sidebarCollapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}
-          </button>
-        </div>
+              {/* Products with dropdown */}
+              <li className={activeTab === "products" ? "active" : ""}>
+                <button
+                  className={`dropdown-toggle ${openDropdown === "products" ? "open" : ""}`}
+                  onClick={() => toggleDropdown("products")}
+                >
+                  <FiPackage size={18} />
+                  <span>Products</span>
+                  <FiChevronDown
+                    size={16}
+                    className="dropdown-icon"
+                  />
+                </button>
 
-        {/* Navigation */}
-        <div className="sidebar-nav">
-          <ul>
-            <li className={activeTab === "dashboard" ? "active" : ""}>
-              <button onClick={() => handleTabChange("dashboard")}>
-                <FiHome size={18} />
-                <span>Dashboard</span>
-              </button>
-            </li>
-            <li className={activeTab === "orders" ? "active" : ""}>
-              <button onClick={() => handleTabChange("orders")}>
-                <FiShoppingBag size={18} />
-                <span>Orders</span>
-              </button>
-            </li>
+                {/* Dropdown menu */}
+                {openDropdown === "products" && (
+                  <ul className="dropdown-menu">
+                    <li className={activeSubTab === "" ? "active-subtab" : ""}>
+                      <button onClick={() => handleTabChange("products", "")}>
+                        <FiList size={18} />
+                        <span>All Products</span>
+                      </button>
+                    </li>
+                    <li className={activeSubTab === "add" ? "active-subtab" : ""}>
+                      <button onClick={() => handleTabChange("products", "add")}>
+                        <FiPlus size={14} />
+                        <span>Add Product</span>
+                      </button>
+                    </li>
+                    <li className={activeSubTab === "update" ? "active-subtab" : ""}>
+                      <button onClick={() => handleTabChange("products", "update")}>
+                        <FiEdit size={14} />
+                        <span>Update Products</span>
+                      </button>
+                    </li>
+                  </ul>
+                )}
+              </li>
 
-            {/* Products with dropdown */}
-            <li className={activeTab === "products" ? "active" : ""}>
-              <button
-                className={`dropdown-toggle ${openDropdown === "products" ? "open" : ""}`}
-                onClick={() => toggleDropdown("products")}
-              >
-                <FiPackage size={18} />
-                <span>Products</span>
-                <FiChevronDown
-                  size={16}
-                  className="dropdown-icon"
-                />
-              </button>
+              <li className={activeTab === "customers" ? "active" : ""}>
+                <button onClick={() => handleTabChange("customers")}>
+                  <FiUsers size={18} />
+                  <span>Customers</span>
+                </button>
+              </li>
+            </ul>
+          </div>
 
-              {/* Dropdown menu */}
-              {openDropdown === "products" && (
-                <ul className="dropdown-menu">
-                  <li className={activeSubTab === "" ? "active-subtab" : ""}>
-                    <button onClick={() => handleTabChange("products", "")}>
-                      <FiList size={18} />
-                      <span>All Products</span>
-                    </button>
-                  </li>
-                  <li className={activeSubTab === "add" ? "active-subtab" : ""}>
-                    <button onClick={() => handleTabChange("products", "add")}>
-                      <FiPlus size={14} />
-                      <span>Add Product</span>
-                    </button>
-                  </li>
-                  <li className={activeSubTab === "update" ? "active-subtab" : ""}>
-                    <button onClick={() => handleTabChange("products", "update")}>
-                      <FiEdit size={14} />
-                      <span>Update Products</span>
-                    </button>
-                  </li>
-                </ul>
+          {/* Sidebar Footer */}
+          <div className="sidebar-footer">
+            <button 
+              className={`logout-btn ${logoutLoading ? 'loading' : ''}`} 
+              onClick={handleLogout}
+              disabled={logoutLoading}
+            >
+              {logoutLoading ? (
+                <span className="logout-loading">Logging out...</span>
+              ) : (
+                <>
+                  <FiLogOut size={18} />
+                  <span>Logout</span>
+                </>
               )}
-            </li>
+            </button>
+          </div>
+        </aside>
 
-            <li className={activeTab === "customers" ? "active" : ""}>
-              <button onClick={() => handleTabChange("customers")}>
-                <FiUsers size={18} />
-                <span>Customers</span>
-              </button>
-            </li>
-          </ul>
-        </div>
+        {/* Main Content Area */}
+        <main className="admin-content">
+          {/* Mobile menu button only */}
+          <div className="mobile-menu-container">
+            <button className="mobile-menu-btn" onClick={toggleMobileMenu}>
+              <FiMenu size={24} />
+            </button>
+          </div>
 
-        {/* Sidebar Footer */}
-        <div className="sidebar-footer">
-          <button 
-            className={`logout-btn ${logoutLoading ? 'loading' : ''}`} 
-            onClick={handleLogout}
-            disabled={logoutLoading}
-          >
-            {logoutLoading ? (
-              <span className="logout-loading">Logging out...</span>
-            ) : (
-              <>
-                <FiLogOut size={18} />
-                <span>Logout</span>
-              </>
-            )}
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="admin-content">
-        {/* Mobile menu button only */}
-        <div className="mobile-menu-container">
-          <button className="mobile-menu-btn" onClick={toggleMobileMenu}>
-            <FiMenu size={24} />
-          </button>
-        </div>
-
-        {/* Page content */}
-        <div className="admin-page-content">
-          {renderContent()}
-        </div>
-      </main>
-    </div>
+          {/* Page content */}
+          <div className="admin-page-content">
+            {renderContent()}
+          </div>
+        </main>
+      </div>
+    </>
   );
 };
 

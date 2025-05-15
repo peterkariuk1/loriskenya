@@ -1,0 +1,33 @@
+# robots.txt for https://loriskenya.com
+User-agent: *
+Allow: /
+Allow: /all-products
+
+# Disallow private and sensitive areas
+Disallow: /admin/
+Disallow: /profile
+Disallow: /checkout
+Disallow: /order-success
+Disallow: /orders
+Disallow: /login
+Disallow: /register
+Disallow: /reset-password
+
+# Disallow Dynamic Search Results
+Disallow: /all-products?search=
+
+# Allow indexing of product categories
+Allow: /all-products?category=
+
+# Don't index multiple sort orders of the same content
+Disallow: /all-products?sort=
+
+# Set crawl delay for heavy bots (optional)
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+# Point to your XML sitemap
+Sitemap: https://loriskenya.com/sitemap.xml

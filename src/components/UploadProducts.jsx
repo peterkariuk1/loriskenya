@@ -9,7 +9,7 @@ import { db } from "../../firebase/firebaseConfig";
 import { collection, addDoc, getDocs, query, where, Timestamp } from "firebase/firestore";
 import axios from "axios";
 
-const BACKEND_URL = "https://loriskenya-backend-production.up.railway.app/api";
+const BACKEND_URL = "https://loriskenya-backend.onrender.com/api";
 
 const UploadProducts = () => {
   // Form state

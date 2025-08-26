@@ -38,7 +38,7 @@ function App() {
   }, []);
 
   return (
-    <di
+    <div></div>
     <>
       {isLoading ? (
         <Loader />

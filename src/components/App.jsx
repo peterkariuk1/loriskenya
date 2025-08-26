@@ -38,6 +38,7 @@ function App() {
   }, []);
 
   return (
+    <di
     <>
       {isLoading ? (
         <Loader />

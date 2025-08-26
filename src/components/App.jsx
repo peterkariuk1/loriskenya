@@ -38,7 +38,6 @@ function App() {
   }, []);
 
   return (
-    <div></div>
     <>
       {isLoading ? (
         <Loader />

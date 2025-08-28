@@ -44,9 +44,9 @@ function App() {
       ) : (
         <CartProvider>
           <Routes>
-            {/*<Route path="/" element={<Home />}></Route>*/}
+          <Route path="/" element={<Home />}></Route>
             {/* Maintenance page during build time */}
-            <Route path="/" element={<Maintenance />}></Route>
+             {/* <Route path="/" element={<Maintenance />}></Route>*/}
             <Route path="/load-test" element={<Loader />}></Route>
             <Route path="/admin" element={<Admin />}></Route>
             <Route path="/login" element={<Login />}></Route>

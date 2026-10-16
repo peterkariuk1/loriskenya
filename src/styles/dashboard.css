@@ -124,7 +124,7 @@
 }
 
 .order-id {
-  font-family: monospace;
+  font-family: var(--font-primary);
   color: #666;
 }
 

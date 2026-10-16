@@ -14,7 +14,7 @@
      
 }
 .preloader-tagline {
-    font-family: 'Great Vibes', serif;
+    font-family: var(--font-luxury);
     font-size: 1.2rem;
     color: #555;
     margin-top: 1rem;

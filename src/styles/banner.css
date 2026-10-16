@@ -1,16 +1,16 @@
-@import url("https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap");
 .banner-container {
   width: 100%;
-  height: 280px;
+  height: 100px;
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  overflow: hidden;
 }
 .banner-slide {
   position: absolute;
   width: 100%;
   height: 100%;
   background-size: cover;
-  background-position: center;
+  background-position: center 46%;
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 1.5s ease, transform 1.5s ease;
@@ -25,27 +25,35 @@
 
 .banner-overlay {
   position: absolute;
-  bottom: 30%;
-  right: 10%;
+  top: 50%;
+  right: 6%;
+  width: min(48%, 560px);
+  transform: translateY(-50%);
+  z-index: 1;
 }
 .banner-overlay h1 {
   color: var(--primary-color);
-  font-size: 18px;
-  margin: 0px;
+  font-size: clamp(10px, 1.35vw, 14px);
+  line-height: 1.1;
+  margin: 0 0 2px;
 }
 .banner-overlay h3 {
-  font-size: 34px;
-  margin-top: 5px;
-  font-weight: 400;
-  margin-bottom: 5px;
-  font-family: "Indie Flower";
+  max-width: 100%;
+  font-size: clamp(14px, 2.1vw, 23px);
+  line-height: 1.05;
+  margin: 0 0 5px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
 }
 .cta-banner-button {
   border: 1px solid #ab8e66;
-  padding: 9px 13px;
+  min-height: 24px;
+  padding: 3px 9px;
   background-color: var(--secondary-color);
   color: var(--tertiary-color);
   border-radius: 5px;
+  font-size: clamp(9px, 1vw, 12px);
+  line-height: 1;
 }
 .cta-banner-button:hover {
   transform: scale(1.05);
@@ -62,36 +70,39 @@
 }
 @media (max-width: 990px) {
   .banner-overlay {
-    width: 50vw;
+    width: min(58%, 480px);
     right: 5%;
   }
 }
 @media (max-width: 580px) {
   .banner-overlay {
-    width: 50vw;
-    right: 5%;
+    width: 67%;
+    right: 4%;
   }
   .banner-overlay h1 {
+    font-size: 10px;
+  }
+  .banner-overlay h3 {
     font-size: 14px;
-
+    line-height: 1;
+    margin-bottom: 4px;
   }
-  .banner-overlay h3 {
-    font-size: 30px;
-    margin-top: 5px 0px;
-
+  .cta-banner-button {
+    min-height: 22px;
+    padding: 3px 7px;
   }
-}@media (max-width: 460px) {
+}
+
+@media (max-width: 460px) {
   .banner-overlay {
-    width: 60vw;
-    right: 5%;
+    width: 74%;
+    right: 3%;
   }
   .banner-overlay h1 {
-    font-size: 12px;
-
+    font-size: 9px;
   }
   .banner-overlay h3 {
-    font-size: 26px;
-    margin-top: 5px 0px;
-
+    font-size: 12px;
+    max-width: 95%;
   }
 }

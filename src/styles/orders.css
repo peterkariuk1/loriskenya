@@ -1,6 +1,6 @@
 /* Base container styles */
 .orders-page {
-  font-family: "Poppins", sans-serif;
+  font-family: var(--font-primary);
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;

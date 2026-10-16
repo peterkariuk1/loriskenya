@@ -1,9 +1,7 @@
 import "../styles/grid.css";
 import React, { useState, useEffect } from "react";
-import categoryIcon from "../assets/category-icon.png";
 import shareIcon from "../assets/share-icon.png";
-import addToCartIcon from "../assets/bag-icon.png";
-import seeMoreIcon from "../assets/see-more.png";
+import ProductCard from "./ProductCard";
 import { useCart } from "../context/CartContext.jsx";
 import { db } from "../../firebase/firebaseConfig.js";
 import { collection, getDocs, query, where } from "firebase/firestore";
@@ -97,15 +95,6 @@ const LadiesGrid = () => {
     setTimeout(() => {
       setNotification(prev => ({ ...prev, visible: false }));
     }, 3000);
-  };
-
-  // Function to open modal with product details
-  const openProductModal = (product) => {
-    setSelectedProduct(product);
-    setQuantity(1); // Reset quantity when opening a new product
-    setIsModalOpen(true);
-    // Prevent scrolling on body when modal is open
-    document.body.style.overflow = 'hidden';
   };
 
   // Function to close modal
@@ -280,68 +269,13 @@ const LadiesGrid = () => {
       ) : (
         <div className="grid-container">
           {visibleProducts.map((product) => (
-            <div className="grid-item" key={product.id}>
-              {/* Add out of stock overlay */}
-              {product.inStock === false && (
-                  <div className="out-of-stock-overlay">
-                    <span>Out of Stock</span>
-                  </div>
-                )}
-              <div className="cart-options">
-                <div
-                  title="Share"
-                  onClick={() => handleShare(product)}
-                >
-                  <img className="share--icon" src={shareIcon} alt="Share" />
-                </div>
-                <div
-                  title="Add to Cart"
-                  onClick={() => quickAddToCart(product, 1)}
-                >
-                  <img
-                    className="cart--icon"
-                    src={addToCartIcon}
-                    alt="Add to cart"
-                  />
-                </div>
-                <div
-                  title="View Details"
-                  onClick={() => openProductModal(product)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <img
-                    className="more--icon"
-                    src={seeMoreIcon}
-                    alt="View details"
-                  />
-                </div>
-              </div>
-              <img
-                src={getProductImage(product)}
-                alt={product.name || "Product Image"}
-                className="grid-image"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = defaultImage;
-                }}
-              />
-              <p className="grid-name">{capitalizeWords(product.name)}</p>
-              <p className="category-name">
-                <img src={categoryIcon} alt="Category" />
-                {product.category || "Uncategorized"}
-              </p>
-              
-              {/* Add quantities display */}
-              {product.quantities && product.quantities.length > 0 && (
-                <div className="grid-item-quantities">
-                  {product.quantities.map((qty, index) => (
-                    <span key={index} className="quantity-chip">{qty}</span>
-                  ))}
-                </div>
-              )}
-              
-              <p className="grid-item-price">{formatPrice(product.price)}</p>
-            </div>
+            <ProductCard
+              key={product.id}
+              product={product}
+              formatPrice={formatPrice}
+              onAddToCart={quickAddToCart}
+              onShare={handleShare}
+            />
           ))}
         </div>
       )}

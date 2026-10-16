@@ -295,7 +295,7 @@
 .product-id {
   font-size: 12px;
   color: #999;
-  font-family: monospace;
+  font-family: var(--font-primary);
 }
 
 .status-badge {

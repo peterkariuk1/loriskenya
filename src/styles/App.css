@@ -1,14 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Orbitron:wght@400..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&family=Prata&display=swap');
 
 :root{
   --primary-color: #ab8e66;
   --secondary-color: #000000;
   --tertiary-color: #fffcf0;
+  --font-primary: "Ubuntu Sans", sans-serif;
+  --font-luxury: "Prata", serif;
 }
 body{
   margin: 0;
-  font-family: 'Source Sans 3', 'sans serif';
+  font-family: var(--font-primary);
+  font-stretch: 95%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  font-stretch: inherit;
 }
 .view-all-button {
   border: 1px solid #ab8e66;

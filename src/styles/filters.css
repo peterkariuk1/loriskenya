@@ -13,7 +13,7 @@
   margin-top: 0px;
   text-align: center;
   color: var(--primary-color);
-  font-family: "Great Vibes";
+  font-family: var(--font-luxury);
   font-weight: 200;
 }
 

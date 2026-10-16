@@ -27,6 +27,84 @@
 .header-actions {
   display: flex;
   gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.add-client-button, .save-client-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  background: var(--primary-color, #ab8e66);
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.add-client-button:hover, .save-client-btn:hover {
+  background: #947750;
+}
+
+.save-client-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.reporting-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.reporting-label {
+  color: #666;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.period-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: #f3f3f3;
+  border-radius: 5px;
+}
+
+.period-tabs button {
+  border: none;
+  background: transparent;
+  color: #555;
+  cursor: pointer;
+  padding: 7px 10px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+.period-tabs button.active {
+  background: white;
+  color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.reporting-controls input {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 7px 9px;
+  color: #444;
+}
+
+.custom-date-fields {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #666;
 }
 
 /* Search Input */
@@ -120,7 +198,7 @@
 /* Statistics Cards */
 .customers-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   margin-bottom: 30px;
 }
@@ -158,6 +236,16 @@
 .revenue-icon {
   background: rgba(171, 142, 102, 0.1);
   color: var(--primary-color, #ab8e66);
+}
+
+.loyalty-icon {
+  background: rgba(171, 142, 102, 0.1);
+  color: var(--primary-color, #ab8e66);
+}
+
+.period-hint {
+  color: #888;
+  font-size: 11px;
 }
 
 .stat-details h3 {
@@ -246,7 +334,7 @@
 .customer-id {
   font-size: 12px;
   color: #999;
-  font-family: monospace;
+  font-family: var(--font-primary);
 }
 
 /* Contact Cell */
@@ -318,6 +406,108 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.modal-close {
+  margin-left: auto;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  color: #777;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.add-client-modal label {
+  display: block;
+  margin: 0 0 6px;
+  color: #555;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.add-client-modal label:not(:first-child) {
+  margin-top: 15px;
+}
+
+.add-client-modal label span {
+  color: #b33;
+}
+
+.add-client-modal label small {
+  color: #888;
+  font-weight: 400;
+}
+
+.add-client-modal input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font: inherit;
+}
+
+.add-client-modal input:focus {
+  border-color: var(--primary-color, #ab8e66);
+  outline: none;
+}
+
+.form-message {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.form-message.error {
+  background: #fff1f0;
+  color: #a61d24;
+}
+
+.form-message.duplicate {
+  background: #fff8e6;
+  color: #805b00;
+}
+
+.form-message button {
+  display: block;
+  margin-top: 7px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.purchase-history {
+  max-height: 230px;
+  overflow-y: auto;
+}
+
+.purchase-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.purchase-row div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.purchase-row span, .history-empty {
+  color: #777;
+  font-size: 13px;
+}
+
+.history-empty {
+  margin: 0;
 }
 
 .modal-header {
@@ -513,16 +703,30 @@
   .customers-stats {
     grid-template-columns: 1fr;
   }
+
+  .reporting-controls {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .period-tabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .period-tabs button {
+    white-space: nowrap;
+  }
   
   /* Adjust table for mobile */
   .customers-table th:nth-child(5),
   .customers-table td:nth-child(5) {
-    display: none; /* Hide location column */
+    display: none; /* Hide loyalty points column */
   }
   
-  .customers-table th:nth-child(3),
-  .customers-table td:nth-child(3) {
-    display: none; /* Hide joined column */
+  .customers-table th:nth-child(6),
+  .customers-table td:nth-child(6) {
+    display: none; /* Hide joined date column */
   }
   
   .detail-row {

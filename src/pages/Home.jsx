@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import Banner from "../components/Banner.jsx";
 import Categories from "../components/Categories.jsx";
@@ -7,8 +7,12 @@ import BestSellerGrid from "../components/BestSellerGrid.jsx";
 import LadiesGrid from "../components/LadiesGrid.jsx";
 import Footer from "../components/Footer.jsx";
 import { Helmet } from "react-helmet";
+import { useStorefrontScrollRestoration } from "../hooks/useStorefrontScrollRestoration";
 
 const Home = () => {
+  const location = useLocation();
+  useStorefrontScrollRestoration(`${location.pathname}${location.search}`);
+
   return (
     <>
       <Helmet>
@@ -30,7 +34,11 @@ const Home = () => {
         <MensGrid />
 
         <Link to="/all-products">
-          <button style={{ textDecoration: "none" }} className="view-all-button">
+          <button
+            type="button"
+            style={{ textDecoration: "none" }}
+            className="view-all-button"
+          >
             View All Products
           </button>
         </Link>

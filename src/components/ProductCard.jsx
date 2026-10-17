@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion as Motion, useReducedMotion } from "motion/react";
 import categoryIcon from "../assets/category-icon.png";
 import shareIcon from "../assets/share-icon.png";
+import { STOREFRONT_SCROLL_KEY } from "../hooks/useStorefrontScrollRestoration";
 
 const capitalizeWords = (value) => {
   if (!value) return "";
@@ -42,7 +43,16 @@ const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
     product.category || "Uncategorized"
   )}&pid=${product.id}`;
 
-  const openDetails = () => navigate(productUrl);
+  const openDetails = () => {
+    sessionStorage.setItem(
+      STOREFRONT_SCROLL_KEY,
+      JSON.stringify({
+        path: `${window.location.pathname}${window.location.search}`,
+        scrollY: window.scrollY,
+      })
+    );
+    navigate(productUrl);
+  };
 
   const handleCardKeyDown = (event) => {
     if (event.key === "Enter" || event.key === " ") {

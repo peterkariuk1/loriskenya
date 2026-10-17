@@ -25,6 +25,7 @@ const Product = () => {
     visible: false,
     message: '',
   });
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   // Fetch product data
   useEffect(() => {
@@ -154,11 +155,11 @@ const Product = () => {
 
   // Update the Back button to use the category if available
   const handleBackNavigation = () => {
-    if (categoryFromUrl) {
-      navigate(`/?category=${encodeURIComponent(categoryFromUrl)}`);
-    } else {
-      navigate(-1); // Default fallback
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
     }
+    navigate(categoryFromUrl ? `/?category=${encodeURIComponent(categoryFromUrl)}` : "/");
   };
 
   if (loading) {
@@ -258,7 +259,18 @@ const Product = () => {
           {product.description && (
             <div className="product-page-description">
               <h3>Description</h3>
-              <p>{product.description}</p>
+              <p className={isDescriptionExpanded ? "expanded" : ""}>
+                {product.description}
+              </p>
+              {product.description.length > 220 && (
+                <button
+                  type="button"
+                  className="description-toggle"
+                  onClick={() => setIsDescriptionExpanded((expanded) => !expanded)}
+                >
+                  {isDescriptionExpanded ? "Read Less" : "Read More"}
+                </button>
+              )}
             </div>
           )}
 

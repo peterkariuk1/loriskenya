@@ -9,6 +9,7 @@
   text-align: start;
   border-bottom: 1px solid rgba(185, 185, 185, 0.168);
   border-radius: 28%;
+  scroll-margin-top: 88px;
 }
 
 .generic-text {

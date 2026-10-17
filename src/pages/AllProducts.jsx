@@ -1,10 +1,15 @@
+import { useLocation } from "react-router-dom"
 import Header from '../components/Header.jsx'
 import Filters from '../components/Filters.jsx'
 import Grid from '../components/Grid.jsx'
 import Footer from '../components/Footer.jsx'
 import { Helmet } from 'react-helmet'
+import { useStorefrontScrollRestoration } from "../hooks/useStorefrontScrollRestoration";
 
 function AllProducts() {
+  const location = useLocation();
+  useStorefrontScrollRestoration(`${location.pathname}${location.search}`);
+
   return (
     <>
         <Helmet>

@@ -1,5 +1,5 @@
 import "../styles/grid.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import shareIcon from "../assets/share-icon.png";
 import ProductCard from "./ProductCard";
 import { db } from "../../firebase/firebaseConfig.js";
@@ -7,6 +7,7 @@ import { collection, getDocs, query, limit, orderBy } from "firebase/firestore";
 import { useCart } from "../context/CartContext";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { FiArrowLeft } from 'react-icons/fi';
+import { STOREFRONT_SCROLL_KEY } from "../hooks/useStorefrontScrollRestoration";
 
 const Grid = () => {
   const [products, setProducts] = useState([]);
@@ -26,6 +27,8 @@ const Grid = () => {
     message: '',
     product: null
   });
+  const gridRef = useRef(null);
+  const previousCategory = useRef(null);
 
   const { addToCart } = useCart();
 
@@ -41,6 +44,21 @@ const Grid = () => {
   const category = searchParams.get("category") || "";
   const sortBy = searchParams.get("sort") || "newest";
   const searchQuery = searchParams.get("search") || "";
+
+  useEffect(() => {
+    if (loading || !gridRef.current) return;
+    if (sessionStorage.getItem(STOREFRONT_SCROLL_KEY)) return;
+    if (previousCategory.current === category) return;
+
+    if (category) {
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      gridRef.current.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "start",
+      });
+    }
+    previousCategory.current = category;
+  }, [category, loading]);
 
   // Add handleBack function
   const handleBack = () => {
@@ -398,7 +416,7 @@ useEffect(() => {
   };
 
   return (
-    <div id='grid-section' className="paginated-grid-section">
+    <div id='grid-section' ref={gridRef} className="paginated-grid-section">
       {/* Add back button at the top */}
       <button onClick={handleBack} className="back-button">
         <FiArrowLeft /> Back to Home

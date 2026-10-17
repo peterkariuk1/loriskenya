@@ -24,6 +24,12 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  useEffect(() => {
     const firstImage = new Image();
     firstImage.src = bannerImages[0]?.url;
   

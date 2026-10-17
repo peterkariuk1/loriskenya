@@ -127,21 +127,6 @@ const Filters = () => {
       <div className="filter-price-container">
         <div className="price--container">
           Filter by Price
-          <div className="max-min-price-inputs">
-            <input 
-              type="number" 
-              value={minPrice}
-              onChange={(e) => setMinPrice(Math.max(0, parseInt(e.target.value) || 0))}
-              placeholder="Min"
-            />
-            -
-            <input 
-              type="number" 
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(Math.max(minPrice, parseInt(e.target.value) || 0))}
-              placeholder="Max"
-            />
-          </div>
           <div className="price-range-slider">
             <input
               className="price-filter"

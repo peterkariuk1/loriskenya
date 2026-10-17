@@ -2,6 +2,8 @@ import { Route, Routes } from "react-router-dom";
 import { useState, useEffect } from "react";
 import emailjs from '@emailjs/browser';
 import { CartProvider } from "../context/CartContext";
+import { VisitorProvider } from "../context/VisitorContext";
+import PersonalizationConsent from "./PersonalizationConsent";
 import "../styles/App.css";
 import Home from "../pages/Home.jsx";
 import Admin from "../pages/Admin.jsx";
@@ -50,8 +52,9 @@ function App() {
       {isLoading ? (
         <Loader />
       ) : (
-        <CartProvider>
-          <Routes>
+        <VisitorProvider>
+          <CartProvider>
+            <Routes>
           <Route path="/" element={<Home />}></Route>
             {/* Maintenance page during build time */}
              {/* <Route path="/" element={<Maintenance />}></Route>*/}
@@ -75,8 +78,10 @@ function App() {
                 </ProtectedRoute>
               }>
             </Route>
-          </Routes>
-        </CartProvider>
+            </Routes>
+            <PersonalizationConsent />
+          </CartProvider>
+        </VisitorProvider>
       )}
     </>
   );

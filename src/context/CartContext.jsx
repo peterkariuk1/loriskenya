@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { auth } from "../../firebase/firebaseConfig.js";
 import { onAuthStateChanged } from "firebase/auth";
 import { getStockQuantity } from "../utils/inventory";
+import { useVisitor } from "./VisitorContext";
 
 // Create the context
 const CartContext = createContext();
@@ -13,6 +14,7 @@ export const CartProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { trackAddToCart } = useVisitor();
   
   // Listen for auth state changes
   useEffect(() => {
@@ -74,6 +76,7 @@ export const CartProvider = ({ children }) => {
         return [...prevCart, { ...product, quantity: Math.min(quantity, availableStock) }];
       }
     });
+    trackAddToCart(product);
     return true;
   };
   

@@ -8,10 +8,19 @@ import LadiesGrid from "../components/LadiesGrid.jsx";
 import Footer from "../components/Footer.jsx";
 import { Helmet } from "react-helmet";
 import { useStorefrontScrollRestoration } from "../hooks/useStorefrontScrollRestoration";
+import { useVisitor } from "../context/VisitorContext";
+import { getSectionOrder } from "../utils/personalization";
 
 const Home = () => {
   const location = useLocation();
+  const { profile, sessionId, optedOut } = useVisitor();
   useStorefrontScrollRestoration(`${location.pathname}${location.search}`);
+  const sectionComponents = {
+    best: <BestSellerGrid />,
+    ladies: <LadiesGrid />,
+    men: <MensGrid />,
+  };
+  const sectionOrder = optedOut ? ["best", "ladies", "men"] : getSectionOrder(profile, sessionId);
 
   return (
     <>
@@ -29,9 +38,9 @@ const Home = () => {
         <Banner />
         <Categories />
         {/* Added different categorised grids */}
-        <BestSellerGrid />
-        <LadiesGrid />
-        <MensGrid />
+        {sectionOrder.map((section) => (
+          <div key={section}>{sectionComponents[section]}</div>
+        ))}
 
         <Link to="/all-products">
           <button

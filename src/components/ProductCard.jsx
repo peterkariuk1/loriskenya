@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion as Motion, useReducedMotion } from "motion/react";
 import categoryIcon from "../assets/category-icon.png";
 import shareIcon from "../assets/share-icon.png";
 import { STOREFRONT_SCROLL_KEY } from "../hooks/useStorefrontScrollRestoration";
 import { getStockQuantity, isProductAvailable } from "../utils/inventory";
+import { useVisitor } from "../context/VisitorContext";
+import { getProductScore } from "../utils/personalization";
+import { DEBUG_STORAGE_KEY } from "../utils/personalizationConfig";
 
 const capitalizeWords = (value) => {
   if (!value) return "";
@@ -13,6 +16,15 @@ const capitalizeWords = (value) => {
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+};
+
+const isDebugEnabled = () => {
+  if (!import.meta.env.DEV) return false;
+  try {
+    return window.localStorage.getItem(DEBUG_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
 };
 
 const getProductImage = (product) => {
@@ -38,11 +50,17 @@ const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
   const [quantity, setQuantity] = useState(1);
   const isAvailable = isProductAvailable(product);
   const maxQuantity = getStockQuantity(product);
+  const { profile, trackImpression, trackClick, trackDwell } = useVisitor();
+  const cardRef = useRef(null);
+  const dwellStartedAt = useRef(null);
+  const dwellTotal = useRef(0);
+  const impressionSent = useRef(false);
   const productUrl = `/product/?category=${encodeURIComponent(
     product.category || "Uncategorized"
   )}&pid=${product.id}`;
 
   const openDetails = () => {
+    trackClick(product);
     sessionStorage.setItem(
       STOREFRONT_SCROLL_KEY,
       JSON.stringify({
@@ -52,6 +70,41 @@ const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
     );
     navigate(productUrl);
   };
+
+  useEffect(() => {
+    if (!cardRef.current) return undefined;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        if (!impressionSent.current) {
+          trackImpression(product);
+          impressionSent.current = true;
+        }
+        if (!document.hidden) dwellStartedAt.current = Date.now();
+      } else if (dwellStartedAt.current) {
+        dwellTotal.current += Date.now() - dwellStartedAt.current;
+        dwellStartedAt.current = null;
+      }
+    }, { threshold: 0.5 });
+    observer.observe(cardRef.current);
+    return () => {
+      if (dwellStartedAt.current) dwellTotal.current += Date.now() - dwellStartedAt.current;
+      observer.disconnect();
+      trackDwell(product, dwellTotal.current);
+    };
+  }, [product, trackDwell, trackImpression]);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden && dwellStartedAt.current) {
+        dwellTotal.current += Date.now() - dwellStartedAt.current;
+        dwellStartedAt.current = null;
+      } else if (!document.hidden && cardRef.current) {
+        dwellStartedAt.current = Date.now();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
 
   const handleCardKeyDown = (event) => {
     if (event.key === "Enter" || event.key === " ") {
@@ -74,8 +127,12 @@ const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
     }
   };
 
+  const showDebug = isDebugEnabled() && profile;
+  const debugScore = showDebug ? getProductScore(product, profile) : null;
+
   return (
     <article
+      ref={cardRef}
       className="grid-item product-card"
       onClick={openDetails}
       onKeyDown={handleCardKeyDown}
@@ -118,6 +175,11 @@ const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
       </div>
 
       <div className="product-card-content">
+        {debugScore && (
+          <small className="personalization-debug" aria-label="Personalization score">
+            Score: {debugScore.score.toFixed(2)} ({debugScore.reasons.join(", ") || "default"})
+          </small>
+        )}
         <div className="product-card-price-row">
           <p className="grid-item-price">{formatPrice(product.price)}</p>
           {product.discount && (

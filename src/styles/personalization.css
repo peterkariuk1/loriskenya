@@ -1,0 +1,67 @@
+.personalization-consent {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 20;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  max-width: 25rem;
+  padding: 0.75rem 1rem;
+  color: #454545;
+  background: #f1f1f1;
+  border: 1px solid #dedede;
+  border-radius: 0.35rem;
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 10%);
+  font-size: 0.82rem;
+}
+
+.personalization-consent-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.personalization-consent button {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.personalization-consent-accept {
+  color: #fff;
+  background: #333;
+  border-color: #333 !important;
+  font-weight: 600;
+}
+
+.personalization-consent-decline {
+  color: #777;
+  background: transparent;
+  border-color: #d0d0d0 !important;
+  opacity: 0.7;
+}
+
+.personalization-consent-decline:hover,
+.personalization-consent-decline:focus-visible {
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .personalization-consent {
+    flex-direction: column;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    left: 0.75rem;
+  }
+
+  .personalization-consent-actions {
+    width: 100%;
+  }
+
+  .personalization-consent button {
+    flex: 1;
+  }
+}

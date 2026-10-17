@@ -14,8 +14,8 @@
   left: 0;
   width: 260px;
   height: 100vh;
-  background-color: var(--primary-color, #ab8e66);
-  color: white;
+  background-color: var(--color-surface-emphasis);
+  color: var(--color-text-on-dark);
   display: flex;
   flex-direction: column;
   z-index: 1000;
@@ -26,7 +26,7 @@
 .admin-content {
   flex: 1;
   margin-left: 260px;
-  background-color: #f5f5f5;
+  background-color: var(--palette-light-gray);
   min-height: 100vh;
   transition: margin-left 0.3s ease;
   overflow-y: auto;
@@ -59,13 +59,13 @@
   left: 100%;
   top: 0;
   width: 200px;
-  background-color: white;
+  background-color: var(--color-surface-primary);
   box-shadow: 0 3px 15px rgba(0, 0, 0, 0.15);
   border-radius: 0 4px 4px 0;
 }
 
 .sidebar-collapsed .dropdown-menu button {
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 /* Sidebar Header */
@@ -100,7 +100,7 @@
 .collapse-btn {
   background: none;
   border: none;
-  color: #fff;
+  color: var(--palette-white);
   cursor: pointer;
   padding: 5px;
   opacity: 0.7;
@@ -118,7 +118,7 @@
   display: none;
   background: none;
   border: none;
-  color: #fff;
+  color: var(--palette-white);
   cursor: pointer;
   padding: 5px;
 }
@@ -149,7 +149,7 @@
   padding: 12px 25px;
   background: none;
   border: none;
-  color: white;
+  color: var(--color-text-on-dark);
   text-align: left;
   cursor: pointer;
   font-size: 15px;
@@ -211,7 +211,7 @@
   background: none;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 4px;
-  color: white;
+  color: var(--color-text-on-dark);
   text-align: left;
   cursor: pointer;
   font-size: 15px;
@@ -231,7 +231,7 @@
 .mobile-menu-btn {
   background: none;
   border: none;
-  color: #333;
+  color: var(--color-text-primary);
   cursor: pointer;
   padding: 8px;
   display: flex;
@@ -272,7 +272,7 @@
     display: block;
     position: sticky;
     top: 0;
-    background-color: #f5f5f5;
+    background-color: var(--palette-light-gray);
     z-index: 10;
   }
   
@@ -329,7 +329,7 @@ body {
 .admin-loading {
   text-align: center;
   padding: 40px;
-  background-color: white;
+  background-color: var(--color-surface-primary);
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   width: 300px;
@@ -352,7 +352,7 @@ body {
 .admin-auth-error {
   text-align: center;
   padding: 30px;
-  background-color: white;
+  background-color: var(--color-surface-primary);
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   color: #b91c1c;
@@ -363,7 +363,7 @@ body {
   margin-top: 15px;
   padding: 8px 16px;
   background: #f87171;
-  color: white;
+  color: var(--color-text-on-dark);
   border: none;
   border-radius: 4px;
   cursor: pointer;

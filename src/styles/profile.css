@@ -15,7 +15,7 @@
 .profile-loading {
   text-align: center;
   padding: 100px 0;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 .profile-loading p {
@@ -50,12 +50,12 @@
 }
 
 .profile-section {
-  background-color: #fff;
+  background-color: var(--palette-white);
   border-radius: 8px;
   padding: 30px;
   margin-bottom: 30px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--palette-light-gray);
 }
 
 .profile-section:last-child {
@@ -107,7 +107,7 @@ input {
   border-radius: 6px;
   font-size: 15px;
   transition: all 0.2s ease;
-  background-color: #fff;
+  background-color: var(--palette-white);
 }
 
 input:focus {
@@ -120,14 +120,14 @@ input:disabled {
   background-color: #f9fafb;
   color: #6b7280;
   cursor: not-allowed;
-  border-color: #e5e7eb;
+  border-color: var(--color-border-subtle);
 }
 
 .edit-toggle-btn {
   display: flex;
   align-items: center;
   gap: 5px;
-  background-color: #f3f4f6;
+  background-color: var(--palette-light-gray);
   border: 1px solid #d1d5db;
   color: #374151;
   padding: 6px 12px;
@@ -138,7 +138,7 @@ input:disabled {
 }
 
 .edit-toggle-btn:hover {
-  background-color: #e5e7eb;
+  background-color: var(--color-border-subtle);
 }
 
 .edit-toggle-btn.active {
@@ -156,7 +156,7 @@ input:disabled {
   align-items: center;
   gap: 8px;
   background-color: var(--primary-color);
-  color: white;
+  color: var(--color-action-primary-text);
   border: none;
   padding: 12px 24px;
   border-radius: 4px;
@@ -166,7 +166,7 @@ input:disabled {
 }
 
 .update-btn:hover {
-  background-color: #9a7c58;
+  background-color: var(--palette-dark-gray);
 }
 
 .update-btn:disabled {
@@ -180,7 +180,7 @@ input:disabled {
 
 h1 {
   margin-top: 0;
-  color: #1f2937;
+  color: var(--palette-dark-gray);
   margin-bottom: 30px;
 }
 
@@ -242,7 +242,7 @@ h2 {
 }
 
 .back-button:hover {
-  color: #9a7c58;
+  color: var(--palette-dark-gray);
   text-decoration: underline;
 }
 

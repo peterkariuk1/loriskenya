@@ -35,7 +35,7 @@
 .search-box input {
   width: 100%;
   padding: 10px 15px 10px 38px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
   font-size: 14px;
 }
@@ -51,32 +51,32 @@
 /* View Toggle */
 .view-toggle {
   display: flex;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
   overflow: hidden;
   margin-left: 15px; 
 }
 
 .view-btn {
-  background: white;
+  background: var(--color-surface-primary);
   border: none;
   padding: 10px 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #555;
+  color: var(--color-text-primary);
 }
 
 .view-btn.active {
-  background: var(--primary-color, #ab8e66);
-  color: white;
+  background: var(--primary-color, var(--color-accent));
+  color: var(--color-text-on-dark);
 }
 
 /* Categories */
 .categories-container {
   margin-bottom: 20px;
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   padding: 15px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
@@ -87,7 +87,7 @@
   align-items: center;
   gap: 10px;
   font-weight: 500;
-  color: #555;
+  color: var(--color-text-primary);
   margin-bottom: 15px;
   font-size: 16px;
 }
@@ -100,29 +100,29 @@
 
 .categories-list button {
   padding: 8px 16px;
-  background: #f5f5f5;
+  background: var(--palette-light-gray);
   border: none;
   border-radius: 20px;
   cursor: pointer;
   font-size: 14px;
-  color: #555;
+  color: var(--color-text-primary);
   transition: all 0.2s;
 }
 
 .categories-list button:hover {
-  background: #eee;
+  background: var(--color-border-subtle);
 }
 
 .categories-list button.active {
-  background: var(--primary-color, #ab8e66);
-  color: white;
+  background: var(--primary-color, var(--color-accent));
+  color: var(--color-text-on-dark);
 }
 
 /* Products Count */
 .products-count {
   margin-bottom: 15px;
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 /* Grid View */
@@ -133,7 +133,7 @@
 }
 
 .product-card {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
@@ -149,11 +149,11 @@
   height: 220px;
   position: relative;
   overflow: hidden;
-  background: #f9f9f9;
+  background: var(--palette-light-gray);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .product-image img {
@@ -176,7 +176,7 @@
   justify-content: center;
   color: #bbb;
   font-size: 14px;
-  background: linear-gradient(45deg, #f5f5f5, #efefef);
+  background: var(--palette-light-gray);
 }
 
 .out-of-stock-badge {
@@ -184,7 +184,7 @@
   top: 10px;
   right: 10px;
   background: rgba(255, 0, 0, 0.7);
-  color: white;
+  color: var(--color-text-on-dark);
   padding: 5px 10px;
   border-radius: 4px;
   font-size: 12px;
@@ -199,11 +199,11 @@
   margin: 0 0 8px;
   font-size: 16px;
   font-weight: 500;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .product-category {
-  color: #666;
+  color: var(--color-text-primary);
   font-size: 13px;
   margin-bottom: 8px;
 }
@@ -211,12 +211,12 @@
 .product-price {
   font-weight: 600;
   font-size: 16px;
-  color: var(--primary-color, #ab8e66);
+  color: var(--primary-color, var(--color-accent));
 }
 
 /* List View */
 .products-list {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
@@ -230,14 +230,14 @@
 .products-list th {
   text-align: left;
   padding: 15px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-subtle);
   font-weight: 500;
-  color: #555;
+  color: var(--color-text-primary);
 }
 
 .products-list td {
   padding: 15px;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid var(--palette-light-gray);
   vertical-align: middle;
 }
 
@@ -246,7 +246,7 @@
 }
 
 .products-list tbody tr:hover {
-  background: #f9f9f9;
+  background: var(--palette-light-gray);
 }
 
 .product-cell {
@@ -260,8 +260,8 @@
   height: 60px;
   border-radius: 4px;
   overflow: hidden;
-  background: #f9f9f9;
-  border: 1px solid #eee;
+  background: var(--palette-light-gray);
+  border: 1px solid var(--color-border-subtle);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -283,7 +283,7 @@
   justify-content: center;
   font-size: 10px;
   color: #bbb;
-  background: linear-gradient(45deg, #f5f5f5, #efefef);
+  background: var(--palette-light-gray);
 }
 
 .product-name-id {
@@ -326,7 +326,7 @@
   justify-content: center;
   padding: 60px 20px;
   text-align: center;
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
@@ -336,7 +336,7 @@
   height: 40px;
   border: 3px solid rgba(0, 0, 0, 0.1);
   border-radius: 50%;
-  border-top-color: var(--primary-color, #ab8e66);
+  border-top-color: var(--primary-color, var(--color-accent));
   animation: spin 0.8s linear infinite;
   margin-bottom: 20px;
 }
@@ -348,7 +348,7 @@
 }
 
 .empty-container svg {
-  color: #ddd;
+  color: var(--color-border-subtle);
   margin-bottom: 15px;
 }
 
@@ -359,7 +359,7 @@
 
 .empty-container p {
   margin: 0;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 /* Responsive Adjustments */

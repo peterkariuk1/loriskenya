@@ -1,6 +1,7 @@
 import "../styles/filters.css";
 import React, { useRef, useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import EditorialHeading from "./EditorialHeading";
 import diffuserImage from "../assets/lorisdiffusers.jpg";
 import frequencesImage from "../assets/lorisfrequence.png";
 import nicheImage from "../assets/lorisniche.jpeg";
@@ -99,7 +100,9 @@ const Filters = () => {
   return (
     <div className="filters-section">
       <div className="category-section">
-        <h2 className="section-title">Browse Categories</h2>
+        <EditorialHeading className="section-title">
+          Browse Categories
+        </EditorialHeading>
         <button className="nav-arrow left" onClick={() => scroll("left")}>
           {"<"}
         </button>
@@ -165,9 +168,9 @@ const Filters = () => {
         <div className="sort-dropdown">
           <button className="dropbtn">Sort by: {sortBy.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</button>
           <div className="dropdown-content">
-            <p onClick={() => setSortBy("price-high-to-low")}>Price: High to Low</p>
-            <p onClick={() => setSortBy("price-low-to-high")}>Price: Low to High</p>
-            <p onClick={() => setSortBy("newest")}>Newest Arrivals</p>
+            <button type="button" onClick={() => setSortBy("price-high-to-low")}>Price: High to Low</button>
+            <button type="button" onClick={() => setSortBy("price-low-to-high")}>Price: Low to High</button>
+            <button type="button" onClick={() => setSortBy("newest")}>Newest Arrivals</button>
           </div>
         </div>
       </div>

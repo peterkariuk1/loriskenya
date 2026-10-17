@@ -1,9 +1,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Sans:ital,wght@0,100..800;1,100..800&family=Prata&display=swap');
 
 :root{
-  --primary-color: #ab8e66;
-  --secondary-color: #000000;
-  --tertiary-color: #fffcf0;
+  /* Core palette */
+  --palette-white: #ffffff;
+  --palette-light-gray: #f6f6f6;
+  --palette-dark-gray: #2f2f2f;
+  --palette-near-black: #111111;
+  --palette-gold: #ffcb74;
+
+  /* Semantic color roles */
+  --color-page-background: var(--palette-white);
+  --color-surface-primary: var(--palette-white);
+  --color-surface-secondary: var(--palette-light-gray);
+  --color-surface-emphasis: var(--palette-near-black);
+  --color-text-primary: var(--palette-dark-gray);
+  --color-text-strong: var(--palette-near-black);
+  --color-text-on-dark: var(--palette-white);
+  --color-accent: var(--palette-gold);
+  --color-action-primary-bg: var(--palette-gold);
+  --color-action-primary-text: var(--palette-near-black);
+  --color-action-secondary-bg: var(--palette-white);
+  --color-action-secondary-text: var(--palette-dark-gray);
+  --color-border-subtle: var(--palette-light-gray);
+  --color-border-strong: var(--palette-dark-gray);
+  --color-focus: var(--palette-near-black);
+
+  /* Backwards-compatible aliases used by existing component styles */
+  --primary-color: var(--color-accent);
+  --secondary-color: var(--palette-near-black);
+  --tertiary-color: var(--palette-white);
   --font-primary: "Ubuntu Sans", sans-serif;
   --font-luxury: "Prata", serif;
 }
@@ -11,6 +36,8 @@ body{
   margin: 0;
   font-family: var(--font-primary);
   font-stretch: 95%;
+  background-color: var(--color-page-background);
+  color: var(--color-text-primary);
 }
 
 button,
@@ -20,8 +47,34 @@ select {
   font: inherit;
   font-stretch: inherit;
 }
+
+.editorial-heading {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--palette-near-black);
+}
+
+.editorial-heading-underline {
+  display: block;
+  width: min(180px, 100%);
+  height: 11px;
+  margin-top: -18px;
+  margin-bottom: 10px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.editorial-heading-underline path {
+  fill: none;
+  stroke: var(--palette-near-black);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .view-all-button {
-  border: 1px solid #ab8e66;
+  border: 1px solid var(--color-accent);
   padding: 9px 13px;
   background-color: var(--secondary-color);
   color: var(--tertiary-color);

@@ -15,7 +15,7 @@
 }
 
 .stat-card {
-  background-color: white;
+  background-color: var(--color-surface-primary);
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   padding: 20px;
@@ -33,7 +33,7 @@
   justify-content: center;
   font-size: 22px;
   background-color: rgba(171, 142, 102, 0.1);
-  color: var(--primary-color, #ab8e66);
+  color: var(--primary-color, var(--color-accent));
 }
 
 .stat-details {
@@ -47,14 +47,14 @@
   margin: 0 0 5px;
   font-size: 14px;
   font-weight: 500;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 .stat-value {
   font-size: 24px;
   font-weight: 600;
   margin: 5px 0 0;
-  color: #101828;
+  color: var(--palette-near-black);
 }
 
 /* Dashboard Grid */
@@ -66,7 +66,7 @@
 
 /* Dashboard Cards */
 .dashboard-card {
-  background-color: white;
+  background-color: var(--color-surface-primary);
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   overflow: hidden;
@@ -77,20 +77,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .card-header h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .view-all-btn {
   background: none;
   border: none;
-  color: var(--primary-color, #ab8e66);
+  color: var(--primary-color, var(--color-accent));
   display: flex;
   align-items: center;
   gap: 5px;
@@ -112,20 +112,20 @@
   text-align: left;
   padding: 10px 20px;
   font-weight: 500;
-  color: #666;
+  color: var(--color-text-primary);
   font-size: 14px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .orders-table td {
   padding: 12px 20px;
   font-size: 14px;
-  border-top: 1px solid #f5f5f5;
+  border-top: 1px solid var(--palette-light-gray);
 }
 
 .order-id {
   font-family: var(--font-primary);
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 .status-badge {
@@ -147,12 +147,12 @@
 }
 
 .status-badge.shipped {
-  background-color: #fff8e1;
+  background-color: var(--palette-light-gray);
   color: #ff8f00;
 }
 
 .status-badge.pending {
-  background-color: #f5f5f5;
+  background-color: var(--palette-light-gray);
   color: #616161;
 }
 
@@ -175,7 +175,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid var(--palette-light-gray);
 }
 
 .top-products-list li:last-child {
@@ -191,13 +191,13 @@
 .product-info p {
   margin: 0;
   font-size: 13px;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 .product-revenue {
   font-weight: 600;
   font-size: 14px;
-  color: var(--primary-color, #ab8e66);
+  color: var(--primary-color, var(--color-accent));
 }
 
 /* Alerts */
@@ -212,7 +212,7 @@
   align-items: center;
   gap: 10px;
   padding: 15px 20px;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid var(--palette-light-gray);
   font-size: 14px;
 }
 
@@ -234,7 +234,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 25px;
-  background-color: white;
+  background-color: var(--color-surface-primary);
   border-radius: 8px;
   padding: 20px 25px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
@@ -244,28 +244,28 @@
   margin: 0 0 5px;
   font-size: 24px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .dashboard-title .subtitle {
   margin: 0;
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 .dashboard-date {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #666;
+  color: var(--color-text-primary);
   font-size: 14px;
-  background-color: #f8f8f8;
+  background-color: var(--palette-light-gray);
   padding: 10px 15px;
   border-radius: 6px;
 }
 
 .dashboard-date svg {
-  color: var(--primary-color, #ab8e66);
+  color: var(--primary-color, var(--color-accent));
 }
 
 /* Loading and Error States */

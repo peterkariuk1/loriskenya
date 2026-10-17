@@ -24,7 +24,7 @@
 
 .update-header-title p {
   margin: 0;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 .update-actions {
@@ -42,7 +42,7 @@
 .update-search-container input {
   width: 100%;
   padding: 10px 15px 10px 38px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
   font-size: 14px;
 }
@@ -65,26 +65,26 @@
 
 .update-category-filters button {
   padding: 8px 16px;
-  background: #f5f5f5;
+  background: var(--palette-light-gray);
   border: none;
   border-radius: 20px;
   font-size: 14px;
   cursor: pointer;
-  color: #555;
+  color: var(--color-text-primary);
 }
 
 .update-category-filters button:hover {
-  background: #eee;
+  background: var(--color-border-subtle);
 }
 
 .update-category-filters button.active {
-  background: var(--primary-color, #ab8e66);
-  color: white;
+  background: var(--primary-color, var(--color-accent));
+  color: var(--color-text-on-dark);
 }
 
 /* Table */
 .update-table-container {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   overflow: auto;
@@ -98,13 +98,13 @@
 .update-products-table th {
   text-align: left;
   padding: 15px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-subtle);
   font-weight: 500;
 }
 
 .update-products-table td {
   padding: 15px;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid var(--palette-light-gray);
   vertical-align: middle;
 }
 
@@ -113,11 +113,11 @@
 }
 
 .update-products-table tr:hover {
-  background-color: #f9f9f9;
+  background-color: var(--palette-light-gray);
 }
 
 .update-products-table tr.editing {
-  background-color: #fffde7;
+  background-color: var(--palette-light-gray);
 }
 
 /* Product image */
@@ -130,13 +130,13 @@
   height: 60px;
   object-fit: contain;
   border-radius: 4px;
-  border: 1px solid #eee;
+  border: 1px solid var(--color-border-subtle);
 }
 
 .update-no-image {
   width: 60px;
   height: 60px;
-  background: #f5f5f5;
+  background: var(--palette-light-gray);
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -181,7 +181,7 @@
 .update-edit-input {
   width: 100px;
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
   font-size: 14px;
 }
@@ -233,7 +233,7 @@
 
 /* Make stock button more visible */
 .update-stock-btn {
-  background: #fff8e1;
+  background: var(--palette-light-gray);
   color: #ff8f00;
   border: 1px solid rgba(255, 143, 0, 0.2);
 }
@@ -244,7 +244,7 @@
 }
 
 .update-cancel-btn {
-  background: #f5f5f5;
+  background: var(--palette-light-gray);
   color: #616161;
 }
 
@@ -259,7 +259,7 @@
 .update-empty-state {
   padding: 40px;
   text-align: center;
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
@@ -279,7 +279,7 @@
 }
 
 .update-delete-modal {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   width: 400px;
   max-width: 90vw;
@@ -291,7 +291,7 @@
   align-items: center;
   gap: 15px;
   padding: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .update-warning-icon {
@@ -302,7 +302,7 @@
 .update-modal-header h3 {
   margin: 0;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .update-modal-content {
@@ -320,7 +320,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .update-modal-actions button {
@@ -332,13 +332,13 @@
 }
 
 .update-cancel-btn {
-  background: #f5f5f5;
-  color: #333;
+  background: var(--palette-light-gray);
+  color: var(--color-text-primary);
 }
 
 .update-delete-confirm-btn {
   background: #c62828;
-  color: white;
+  color: var(--color-text-on-dark);
 }
 
 /* Responsive */

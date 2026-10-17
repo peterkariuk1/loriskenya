@@ -46,7 +46,7 @@
   overflow-wrap: anywhere;
 }
 .cta-banner-button {
-  border: 1px solid #ab8e66;
+  border: 1px solid var(--color-accent);
   min-height: 24px;
   padding: 3px 9px;
   background-color: var(--secondary-color);

@@ -15,14 +15,14 @@
   position: absolute;
   inset: 0;
   backdrop-filter: blur(6px);
-  background-color: #000000df;
+  background-color: rgba(17, 17, 17, 0.87);
 }
 .inner-login-container {
   width: 80vw;
   height: 75vh;
   backdrop-filter: blur(30px);
   border-radius: 20px;
-  box-shadow: 1px 2px 8px #ab8e6623;
+  box-shadow: 1px 2px 8px rgba(255, 203, 116, 0.14);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -55,12 +55,7 @@
   cursor: pointer;
 }
 .inner-login-container .center input {
-  background: #ffffff;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(222, 233, 255, 1) 100%
-  );
+  background: var(--palette-white);
   border: none;
   padding: 10px;
   margin-bottom: 10px;
@@ -70,32 +65,22 @@
   color: var(--secondary-color);
 }
 .inner-login-container .center input:focus {
-  outline: 1px solid #ffffff;
+  outline: 1px solid var(--palette-white);
   transform: scale(1.02);
 }
 .inner-login-container .center button {
-    background: #000000;
-    background: radial-gradient(
-      circle,
-      rgb(46, 46, 46) 0%,
-      rgb(33, 33, 33) 100%
-    );
+    background: var(--palette-near-black);
     padding: 5px;
     font-weight: 300;
     font-size: 18px;
     color: var(--tertiary-color);
-    border: 1px solid #ab8e66;
+    border: 1px solid var(--color-accent);
     border-radius: 5px;
     transition: .4s ease background;
     margin-bottom: 6px;
 }
 .inner-login-container .center button:hover {
-    background: #000000;
-    background: radial-gradient(
-      circle,
-      rgb(67, 67, 67) 0%,
-      rgb(33, 33, 33) 100%
-    );
+    background: var(--palette-near-black);
     transform: scale(1.017);
     cursor: pointer;
 }

@@ -2,6 +2,7 @@ import "../styles/grid.css";
 import React, { useState, useEffect } from "react";
 import shareIcon from "../assets/share-icon.png";
 import ProductCard from "./ProductCard";
+import EditorialHeading from "./EditorialHeading";
 import { useCart } from "../context/CartContext.jsx";
 import { db } from "../../firebase/firebaseConfig.js";
 import { collection, getDocs, query, where } from "firebase/firestore";
@@ -270,7 +271,9 @@ const MenPerfumes = () => {
           </div>
         </div>
       )}
-      <p className="generic-text">Confident, Crisp, Bold!</p>
+      <EditorialHeading as="p" className="generic-text">
+        Confident, Crisp, Bold!
+      </EditorialHeading>
       <h2 className="title-mini-grid">Men Best Sellers</h2>
 
       {visibleProducts.length === 0 ? (

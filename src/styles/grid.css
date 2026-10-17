@@ -16,9 +16,18 @@
   margin-bottom: -10px;
   margin-top: 0px;
   text-align: center;
-  color: var(--primary-color);
-  font-family: "Great Vibes";
+  color: var(--palette-near-black);
+  font-family: var(--font-luxury);
   font-weight: 100;
+}
+
+.generic-text.editorial-heading {
+  display: flex;
+  width: 100%;
+}
+
+.generic-text .editorial-heading-underline {
+  width: min(230px, 70%);
 }
 
 .title-mini-grid {
@@ -26,14 +35,13 @@
   font-weight: 200;
   text-align: center;
   margin-top: 5px;
-
 }
 
 .view-collection-button {
   border-top: none;
-  border-bottom: 1px solid #ab8e66;
-  border-left: 1px solid #ab8e66;
-  border-right: 1px solid #ab8e66;
+  border-bottom: 1px solid var(--color-accent);
+  border-left: 1px solid var(--color-accent);
+  border-right: 1px solid var(--color-accent);
   background-color: transparent;
   cursor: pointer;
   padding: 5px 20px;
@@ -53,7 +61,7 @@
 }
 
 .grid-title span {
-  font-family: "Great Vibes";
+  font-family: var(--font-luxury);
   color: var(--primary-color);
   font-size: 16px;
   font-weight: 400;
@@ -65,38 +73,74 @@
   column-gap: 15px;
   row-gap: 25px;
   margin-bottom: 20px;
-
+  align-items: start;
 }
 
 .product-card {
   display: flex;
   flex-direction: column;
+  align-self: start;
   min-width: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .product-card:hover,
 .product-card:focus-visible {
-  border-color: #ab8e66;
+  border-color: var(--color-accent);
   box-shadow: 0 5px 16px rgba(67, 48, 34, 0.12);
   outline: none;
 }
 
+/* ------------------------------------------------------------------
+   PARALLAX IMAGE EFFECT (image fills the card, whole photo visible)
+   ------------------------------------------------------------------
+   - The image is 120% of its frame's height and covers it, so it always
+     fills the card edge to edge.
+   - A small scroll listener in Grid.jsx sets --parallax-y (from -8% to
+     +8%) on each visible image, and the image drifts inside the frame.
+     This works in every browser and with any scrolling ancestor.
+   ------------------------------------------------------------------ */
 .product-card-image-wrap {
   position: relative;
-  background: #faf8f5;
+  display: block;
+  aspect-ratio: 4 / 3;
+  min-height: 180px;
+  width: 100%;
+  overflow: hidden;
+  background: var(--palette-light-gray);
+  z-index: 1;
 }
 
 .product-card .grid-image {
-  display: block;
+  position: absolute;
+  top: -10%;
+  left: 0;
   width: 100%;
-  height: 220px;
-  object-fit: contain;
-  padding: 12px;
+  height: 120%;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  object-fit: cover;
+  object-position: center;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  transform: translate3d(0, var(--parallax-y, 0%), 0);
+  will-change: transform;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card .grid-image {
+    transform: none;
+    top: 0;
+    height: 100%;
+  }
+}
+
+/* ------------------------------------------------------------------ */
 
 .product-card-content {
   display: flex;
@@ -115,14 +159,14 @@
 .product-card .grid-item-price {
   margin: 0;
   color: #2f2118;
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.7rem;
+  font-weight: 200;
 }
 
 .product-discount-badge {
   padding: 3px 6px;
   border-radius: 4px;
-  background: #f4dfbb;
+  background: var(--color-accent);
   color: #674820;
   font-size: 0.7rem;
   font-weight: 700;
@@ -162,7 +206,7 @@
 .card-quantity-controls {
   display: inline-flex;
   align-items: center;
-  border: 1px solid #d8d0c8;
+  border: 1px solid var(--color-border-subtle);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -180,13 +224,13 @@
 }
 
 .card-quantity-controls button {
-  background: #faf8f5;
+  background: var(--palette-light-gray);
   color: #493426;
 }
 
 .card-share-button {
-  background: #ab8e66;
-  color: #fffcf0;
+  background: var(--color-accent);
+  color: var(--palette-white);
 }
 
 .card-quantity-controls button {
@@ -195,7 +239,7 @@
 
 .card-quantity-controls button:hover:not(:disabled),
 .card-share-button:hover {
-  background: #efe6dc;
+  background: var(--palette-light-gray);
 }
 
 .card-quantity-controls button:disabled,
@@ -212,7 +256,7 @@
 
 .card-share-button {
   border-radius: 6px;
-  border: 1px solid #d8d0c8;
+  border: 1px solid var(--color-border-subtle);
 }
 
 .card-share-button img {
@@ -227,7 +271,7 @@
   border: 0;
   border-radius: 5px;
   background: var(--primary-color);
-  color: #fff;
+  color: var(--color-action-primary-text);
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
@@ -235,7 +279,7 @@
 }
 
 .card-add-to-cart:hover:not(:disabled) {
-  background: #8f704c;
+  background: var(--palette-dark-gray);
 }
 
 .product-card button:focus-visible {
@@ -244,11 +288,11 @@
 }
 
 .grid-item {
-  background-color: #fefefe;
+  background-color: var(--palette-white);
   border-radius: 1px;
   padding: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.002);
-  border: 1px solid #dddddd94;
+  border: 1px solid var(--color-border-subtle);
   position: relative;
 }
 
@@ -265,7 +309,7 @@
 }
 
 .grid-item:hover {
-  border: 1px solid #ab8e66;
+  border: 1px solid var(--color-accent);
   cursor: pointer;
 }
 
@@ -323,6 +367,7 @@
   }
 }
 
+/* Generic image rule (non-card usages). Cards override this above. */
 .grid-image {
   width: 100%;
   height: 180px;
@@ -366,13 +411,13 @@
 }
 
 .quantity-chip {
-  background-color: #f3f4f6;
+  background-color: var(--palette-light-gray);
   color: #4b5563;
   font-size: 11px;
   padding: 2px 8px;
   border-radius: 12px;
   display: inline-block;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border-subtle);
 }
 
 .pagination {
@@ -384,7 +429,7 @@
 .pagination button {
   padding: 8px 12px;
   border: none;
-  background: #eee;
+  background: var(--color-border-subtle);
   border-radius: 5px;
   cursor: pointer;
   font-weight: 500;
@@ -392,12 +437,12 @@
 }
 
 .pagination button:hover {
-  background: #ddd;
+  background: var(--color-border-subtle);
 }
 
 .pagination .active {
   background: black;
-  color: white;
+  color: var(--color-text-on-dark);
 }
 
 .product-modal-overlay {
@@ -415,7 +460,7 @@
 }
 
 .product-modal-content {
-  background-color: white;
+  background-color: var(--color-text-on-dark);
   border-radius: 8px;
   max-width: 900px;
   width: 90%;
@@ -433,7 +478,7 @@
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #333;
+  color: var(--color-text-primary);
   width: 30px;
   height: 30px;
   display: flex;
@@ -459,12 +504,12 @@
 .product-modal-name {
   font-size: 24px;
   margin: 0 0 10px;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .product-modal-category {
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-primary);
   margin-bottom: 20px;
 }
 
@@ -475,7 +520,7 @@
 .product-modal-description {
   margin-bottom: 30px;
   line-height: 1.6;
-  color: #555;
+  color: var(--color-text-primary);
 }
 
 .product-modal-quantity {
@@ -492,13 +537,13 @@
 .quantity-controls {
   display: flex;
   align-items: center;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
   overflow: hidden;
 }
 
 .quantity-controls button {
-  background: #f5f5f5;
+  background: var(--palette-light-gray);
   border: none;
   width: 30px;
   height: 30px;
@@ -537,7 +582,7 @@
 
 .add-to-cart-btn {
   background-color: var(--primary-color);
-  color: white;
+  color: var(--color-action-primary-text);
   border: none;
   padding: 10px 20px;
   border-radius: 4px;
@@ -547,7 +592,7 @@
 }
 
 .add-to-cart-btn:hover {
-  background-color: #c5a12e;
+  background-color: var(--color-accent);
 }
 
 .product-modal-sku {
@@ -574,12 +619,12 @@
 }
 
 .quantity-badge {
-  background-color: #f3f4f6;
+  background-color: var(--palette-light-gray);
   color: #4b5563;
   padding: 4px 10px;
   border-radius: 16px;
   font-size: 13px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border-subtle);
 }
 
 .product-modal-image {
@@ -651,7 +696,7 @@
   left: 50%;
   transform: translateX(-50%);
   background-color: #4caf50;
-  color: white;
+  color: var(--color-text-on-dark);
   padding: 0;
   border-radius: 8px;
   z-index: 2000;
@@ -680,7 +725,7 @@
 }
 
 .notification-icon {
-  background-color: white;
+  background-color: var(--color-text-on-dark);
   color: #4caf50;
   width: 24px;
   height: 24px;
@@ -715,7 +760,7 @@
 .notification-close {
   background: transparent;
   border: none;
-  color: white;
+  color: var(--color-text-on-dark);
   font-size: 20px;
   cursor: pointer;
   width: 24px;
@@ -735,7 +780,7 @@
 .product-share-btn {
   display: inline-flex;
   align-items: center;
-  background-color: #f5f5f5;
+  background-color: var(--palette-light-gray);
   border: none;
   border-radius: 4px;
   padding: 8px 15px;
@@ -772,7 +817,7 @@
 }
 
 .back-button:hover {
-  color: #9a7c58;
+  color: var(--palette-dark-gray);
   text-decoration: underline;
 }
 
@@ -798,7 +843,7 @@
 
 .out-of-stock-overlay span {
   background-color: #e53e3e;
-  color: white;
+  color: var(--color-text-on-dark);
   padding: 6px 12px;
   border-radius: 4px;
   font-size: 14px;
@@ -835,7 +880,7 @@
 
 /* Disabled add to cart button */
 .add-to-cart-btn.disabled {
-  background-color: #e2e8f0;
+  background-color: var(--color-border-subtle);
   cursor: not-allowed;
 }
 
@@ -855,17 +900,12 @@
     gap: 12px;
   }
 
-  .product-card .grid-image {
-    height: clamp(150px, 42vw, 200px);
-    padding: 8px;
-  }
-
   .product-card-content {
     padding: 10px;
   }
 
   .product-card .grid-item-price {
-    font-size: 0.95rem;
+    font-size: 1.4rem;
   }
 
   .product-card .grid-name {
@@ -898,8 +938,9 @@
     grid-template-columns: 1fr;
   }
 
-  .product-card .grid-image {
-    height: 220px;
+  /* Single column: taller frame */
+  .product-card-image-wrap {
+    aspect-ratio: 1 / 1;
   }
 }
 
@@ -911,7 +952,7 @@
 }
 
 .skeleton-card {
-  background: #fff;
+  background: var(--palette-white);
   border-radius: 12px;
   padding: 0.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -920,7 +961,7 @@
 .skeleton-image {
   width: 100%;
   height: 160px;
-  background: #f1f1f1;
+  background: var(--palette-light-gray);
   border-radius: 8px;
   filter: blur(4px);
   animation: pulse 1.5s infinite ease-in-out;
@@ -928,7 +969,7 @@
 
 .skeleton-text {
   height: 12px;
-  background: #e3e3e3;
+  background: var(--palette-light-gray);
   border-radius: 4px;
   margin-top: 10px;
   animation: pulse 1.5s infinite ease-in-out;

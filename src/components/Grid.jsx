@@ -337,6 +337,34 @@ const Grid = () => {
     }
   };
 
+  // Parallax: drift each card image inside its frame while scrolling
+useEffect(() => {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  let raf = null;
+  const update = () => {
+    raf = null;
+    const vh = window.innerHeight;
+    document.querySelectorAll(".product-card-image-wrap").forEach((wrap) => {
+      const r = wrap.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh) return; // off-screen
+      const progress = (vh - r.top) / (vh + r.height); // 0 → 1 across the viewport
+      const img = wrap.querySelector(".grid-image");
+      if (img) img.style.setProperty("--parallax-y", `${(progress * 2 - 1) * 8}%`);
+    });
+  };
+  const onScroll = () => { if (raf === null) raf = requestAnimationFrame(update); };
+
+  update();
+  window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+  window.addEventListener("resize", onScroll);
+  return () => {
+    window.removeEventListener("scroll", onScroll, { capture: true });
+    window.removeEventListener("resize", onScroll);
+    if (raf !== null) cancelAnimationFrame(raf);
+  };
+}, [loading, currentPage, filteredProducts.length]);
+
   // Capitalize every word in the item's title
   function capitalizeWords(str) {
     if (!str) return '';

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion as Motion, useReducedMotion } from "motion/react";
 import categoryIcon from "../assets/category-icon.png";
 import shareIcon from "../assets/share-icon.png";
 
@@ -31,6 +32,7 @@ const getProductImage = (product) => {
 
 const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
   const navigate = useNavigate();
+  const prefersReducedMotion = useReducedMotion();
   const [quantity, setQuantity] = useState(1);
   const isAvailable = product.inStock !== false;
   const stockLimit = Number(product.stock);
@@ -80,10 +82,18 @@ const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
       )}
 
       <div className="product-card-image-wrap">
-        <img
+        <Motion.img
           src={getProductImage(product)}
           alt={product.name || "Product Image"}
           className="grid-image"
+          initial={
+            prefersReducedMotion ? false : { opacity: 0, y: 8 }
+          }
+          whileInView={
+            prefersReducedMotion ? undefined : { opacity: 1, y: 0 }
+          }
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           onError={(event) => {
             event.currentTarget.onerror = null;
             event.currentTarget.src =
@@ -155,14 +165,17 @@ const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
               <img src={shareIcon} alt="" aria-hidden="true" />
             </button>
           </div>
-          <button
+          <Motion.button
             type="button"
             className="card-add-to-cart"
             onClick={handleAddToCart}
             disabled={!isAvailable}
+            whileHover={prefersReducedMotion ? undefined : { scale: 1.015 }}
+            whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
           >
             {isAvailable ? "Add to Cart" : "Out of Stock"}
-          </button>
+          </Motion.button>
         </div>
       </div>
     </article>

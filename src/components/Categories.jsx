@@ -9,6 +9,7 @@ import perfumeImage from "../assets/oudperfume.jpeg";
 import autoPerfumeImage from "../assets/lorisaautoperfume.jpg";
 import ladiesImage from "../assets/womanperfume.jpeg";
 import menImage from "../assets/manperfume.jpeg";
+import EditorialHeading from "./EditorialHeading";
 
 // Sample categories
 const categories = [
@@ -73,7 +74,9 @@ function Categories() {
     return (
         <div className="filters-section">
             <div className="category-section">
-                <h2 className="section-title">Browse Categories</h2>
+                <EditorialHeading className="section-title">
+                    Browse Categories
+                </EditorialHeading>
                  {/*<button className="nav-arrow left" onClick={() => scroll("left")}>
                     {"<"}
                 </button>*/}

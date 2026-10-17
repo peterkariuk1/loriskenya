@@ -20,7 +20,7 @@
 }
 
 .success-container {
-  background-color: white;
+  background-color: var(--color-surface-primary);
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   padding: 30px;
@@ -31,7 +31,7 @@
 .loading, .error-message {
   padding: 40px 20px;
   text-align: center;
-  color: #555;
+  color: var(--color-text-primary);
 }
 
 .error-message {
@@ -56,14 +56,14 @@
 
 /* Page title */
 .success-container h1 {
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 28px;
   margin: 0 0 25px;
 }
 
 /* Order details section */
 .order-details {
-  background-color: #f9f9f9;
+  background-color: var(--palette-light-gray);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 30px;
@@ -83,7 +83,7 @@
 .order-date, .order-total, .order-items {
   margin: 8px 0;
   font-size: 15px;
-  color: #444;
+  color: var(--color-text-primary);
 }
 
 .order-confirmation {
@@ -101,14 +101,14 @@
 .delivery-info h2 {
   font-size: 20px;
   margin: 0 0 15px;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .delivery-info p {
   margin: 0 0 10px;
   font-size: 15px;
   line-height: 1.5;
-  color: #444;
+  color: var(--color-text-primary);
 }
 
 /* Next steps section */
@@ -120,7 +120,7 @@
 .next-steps h2 {
   font-size: 20px;
   margin: 0 0 15px;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .next-steps ul {
@@ -132,7 +132,7 @@
   margin-bottom: 10px;
   font-size: 15px;
   line-height: 1.5;
-  color: #444;
+  color: var(--color-text-primary);
 }
 
 /* Action buttons */
@@ -153,16 +153,16 @@
 
 .actions .primary {
   background-color: var(--primary-color);
-  color: white;
+  color: var(--color-text-on-dark);
 }
 
 .actions .primary:hover {
-  background-color: #97815e;
+  background-color: var(--palette-dark-gray);
 }
 
 .actions .secondary {
-  background-color: #f0f0f0;
-  color: #333;
+  background-color: var(--palette-light-gray);
+  color: var(--color-text-primary);
 }
 
 .actions .secondary:hover {
@@ -171,10 +171,10 @@
 
 /* Contact information */
 .contact-info {
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border-subtle);
   padding-top: 20px;
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-primary);
   text-align: left;
 }
 

@@ -21,7 +21,7 @@
 
 .header-title p {
   margin: 0;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 .header-actions {
@@ -39,15 +39,15 @@
   padding: 10px 15px;
   border: none;
   border-radius: 4px;
-  background: var(--primary-color, #ab8e66);
-  color: white;
+  background: var(--primary-color, var(--color-accent));
+  color: var(--color-text-on-dark);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
 }
 
 .add-client-button:hover, .save-client-btn:hover {
-  background: #947750;
+  background: var(--palette-dark-gray);
 }
 
 .save-client-btn:disabled {
@@ -64,7 +64,7 @@
 }
 
 .reporting-label {
-  color: #666;
+  color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 500;
 }
@@ -80,7 +80,7 @@
 .period-tabs button {
   border: none;
   background: transparent;
-  color: #555;
+  color: var(--color-text-primary);
   cursor: pointer;
   padding: 7px 10px;
   border-radius: 3px;
@@ -88,23 +88,23 @@
 }
 
 .period-tabs button.active {
-  background: white;
-  color: #333;
+  background: var(--color-surface-primary);
+  color: var(--color-text-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 .reporting-controls input {
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
   padding: 7px 9px;
-  color: #444;
+  color: var(--color-text-primary);
 }
 
 .custom-date-fields {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 /* Search Input */
@@ -114,7 +114,7 @@
 
 .search-container input {
   padding: 10px 15px 10px 38px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
   font-size: 14px;
   width: 250px;
@@ -122,7 +122,7 @@
 }
 
 .search-container input:focus {
-  border-color: var(--primary-color, #ab8e66);
+  border-color: var(--primary-color, var(--color-accent));
   outline: none;
 }
 
@@ -145,22 +145,22 @@
   align-items: center;
   gap: 8px;
   padding: 10px 15px;
-  background: white;
-  border: 1px solid #ddd;
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
 }
 
 .filter-button:hover {
-  background: #f5f5f5;
+  background: var(--palette-light-gray);
 }
 
 .filter-menu {
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 4px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   z-index: 10;
@@ -183,16 +183,16 @@
   border: none;
   cursor: pointer;
   font-size: 14px;
-  color: #444;
+  color: var(--color-text-primary);
 }
 
 .filter-menu button:hover {
-  background: #f5f5f5;
+  background: var(--palette-light-gray);
 }
 
 .filter-menu button.active {
-  background: var(--primary-color, #ab8e66);
-  color: white;
+  background: var(--primary-color, var(--color-accent));
+  color: var(--color-text-on-dark);
 }
 
 /* Statistics Cards */
@@ -204,7 +204,7 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
@@ -235,12 +235,12 @@
 
 .revenue-icon {
   background: rgba(171, 142, 102, 0.1);
-  color: var(--primary-color, #ab8e66);
+  color: var(--primary-color, var(--color-accent));
 }
 
 .loyalty-icon {
   background: rgba(171, 142, 102, 0.1);
-  color: var(--primary-color, #ab8e66);
+  color: var(--primary-color, var(--color-accent));
 }
 
 .period-hint {
@@ -252,19 +252,19 @@
   margin: 0 0 5px;
   font-size: 14px;
   font-weight: 500;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 .stat-details p {
   margin: 0;
   font-size: 22px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 /* Customers Table */
 .customers-table-container {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   overflow-x: auto;
@@ -279,8 +279,8 @@
   padding: 15px;
   text-align: left;
   font-weight: 500;
-  color: #666;
-  border-bottom: 1px solid #eee;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border-subtle);
   position: relative;
   cursor: pointer;
 }
@@ -293,7 +293,7 @@
 
 .customers-table td {
   padding: 15px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--palette-light-gray);
   vertical-align: middle;
   font-size: 14px;
 }
@@ -303,7 +303,7 @@
 }
 
 .customers-table tbody tr:hover {
-  background: #f9f9f9;
+  background: var(--palette-light-gray);
 }
 
 /* Customer Name Cell */
@@ -317,8 +317,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--primary-color, #ab8e66);
-  color: white;
+  background: var(--primary-color, var(--color-accent));
+  color: var(--color-text-on-dark);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -354,7 +354,7 @@
 }
 
 .contact-info svg {
-  color: #666;
+  color: var(--color-text-primary);
   font-size: 14px;
   flex-shrink: 0;
 }
@@ -371,12 +371,12 @@
   align-items: center;
   gap: 5px;
   padding: 8px 12px;
-  background: #f0f0f0;
+  background: var(--palette-light-gray);
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
-  color: #444;
+  color: var(--color-text-primary);
   transition: background 0.2s;
 }
 
@@ -399,7 +399,7 @@
 }
 
 .customer-modal {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   width: 500px;
   max-width: 90%;
@@ -413,7 +413,7 @@
   padding: 6px;
   border: none;
   background: transparent;
-  color: #777;
+  color: var(--color-text-primary);
   cursor: pointer;
   font-size: 20px;
 }
@@ -421,7 +421,7 @@
 .add-client-modal label {
   display: block;
   margin: 0 0 6px;
-  color: #555;
+  color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 500;
 }
@@ -443,13 +443,13 @@
   box-sizing: border-box;
   width: 100%;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-subtle);
   border-radius: 4px;
   font: inherit;
 }
 
 .add-client-modal input:focus {
-  border-color: var(--primary-color, #ab8e66);
+  border-color: var(--primary-color, var(--color-accent));
   outline: none;
 }
 
@@ -461,12 +461,12 @@
 }
 
 .form-message.error {
-  background: #fff1f0;
+  background: var(--palette-light-gray);
   color: #a61d24;
 }
 
 .form-message.duplicate {
-  background: #fff8e6;
+  background: var(--palette-light-gray);
   color: #805b00;
 }
 
@@ -492,7 +492,7 @@
   justify-content: space-between;
   gap: 15px;
   padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--palette-light-gray);
 }
 
 .purchase-row div {
@@ -502,7 +502,7 @@
 }
 
 .purchase-row span, .history-empty {
-  color: #777;
+  color: var(--color-text-primary);
   font-size: 13px;
 }
 
@@ -515,15 +515,15 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .customer-modal-avatar {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--primary-color, #ab8e66);
-  color: white;
+  background: var(--primary-color, var(--color-accent));
+  color: var(--color-text-on-dark);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -538,7 +538,7 @@
 
 .customer-since {
   margin: 0;
-  color: #666;
+  color: var(--color-text-primary);
   font-size: 13px;
 }
 
@@ -558,9 +558,9 @@
   margin: 0 0 15px;
   font-size: 16px;
   font-weight: 500;
-  color: #444;
+  color: var(--color-text-primary);
   padding-bottom: 5px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .detail-row {
@@ -578,7 +578,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 .detail-value {
@@ -588,12 +588,12 @@
 .modal-footer {
   padding: 15px 20px;
   text-align: right;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .close-btn {
   padding: 8px 15px;
-  background: #f0f0f0;
+  background: var(--palette-light-gray);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -613,7 +613,7 @@
   justify-content: center;
   padding: 50px;
   text-align: center;
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
@@ -623,7 +623,7 @@
   height: 40px;
   border: 3px solid rgba(0,0,0,0.1);
   border-radius: 50%;
-  border-top-color: var(--primary-color, #ab8e66);
+  border-top-color: var(--primary-color, var(--color-accent));
   animation: spin 0.8s linear infinite;
   margin-bottom: 15px;
 }
@@ -639,7 +639,7 @@
 }
 
 .empty-state svg {
-  color: #ddd;
+  color: var(--color-border-subtle);
   margin-bottom: 15px;
 }
 
@@ -650,7 +650,7 @@
 
 .empty-state p {
   margin: 0;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 /* Responsive Adjustments */

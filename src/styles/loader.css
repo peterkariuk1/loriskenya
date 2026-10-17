@@ -16,7 +16,7 @@
 .preloader-tagline {
     font-family: var(--font-luxury);
     font-size: 1.2rem;
-    color: #555;
+    color: var(--color-text-primary);
     margin-top: 1rem;
     opacity: 0;
     animation: fadeInTagline 1.5s ease forwards 1s;

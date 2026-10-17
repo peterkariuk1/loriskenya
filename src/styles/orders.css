@@ -20,13 +20,13 @@
   align-items: center;
   margin-bottom: 30px;
   padding-bottom: 15px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .orders-header h1 {
   font-size: 28px;
   margin: 0;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .back-to-shopping {
@@ -42,25 +42,25 @@
 .no-orders {
   text-align: center;
   padding: 40px 20px;
-  background-color: #f9f9f9;
+  background-color: var(--palette-light-gray);
   border-radius: 8px;
   margin: 20px 0;
 }
 
 .no-orders h2 {
   margin-top: 0;
-  color: #555;
+  color: var(--color-text-primary);
 }
 
 .no-orders p {
   margin-bottom: 20px;
-  color: #777;
+  color: var(--color-text-primary);
 }
 
 .shop-now-btn {
   display: inline-block;
   background-color: var(--primary-color);
-  color: white;
+  color: var(--color-text-on-dark);
   padding: 10px 20px;
   border-radius: 4px;
   text-decoration: none;
@@ -68,7 +68,7 @@
 }
 
 .shop-now-btn:hover {
-  background-color: #97815e;
+  background-color: var(--palette-dark-gray);
 }
 
 /* Order card styles */
@@ -79,7 +79,7 @@
 }
 
 .order-card {
-  background-color: white;
+  background-color: var(--color-surface-primary);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
@@ -90,19 +90,19 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 15px 20px;
-  background-color: #f5f5f5;
+  background-color: var(--palette-light-gray);
 }
 
 .order-header h2 {
   margin: 0;
   font-size: 18px;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .order-date {
   margin: 5px 0 0;
   font-size: 14px;
-  color: #777;
+  color: var(--color-text-primary);
 }
 
 /* Status badge styles */
@@ -142,7 +142,7 @@
 /* Order items container */
 .order-items {
   padding: 15px 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 /* Individual order item */
@@ -151,7 +151,7 @@
   gap: 15px;
   margin-bottom: 15px;
   padding-bottom: 15px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--palette-light-gray);
 }
 
 .order-item:last-child {
@@ -180,19 +180,19 @@
 .item-details h3 {
   margin: 0 0 5px;
   font-size: 16px;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .item-category {
   margin: 0 0 8px;
   font-size: 13px;
-  color: #666;
+  color: var(--color-text-primary);
 }
 
 .item-price {
   margin: 0;
   font-weight: 500;
-  color: #444;
+  color: var(--color-text-primary);
 }
 
 /* Order footer with summary and actions */
@@ -214,16 +214,16 @@
   justify-content: space-between;
   margin-bottom: 8px;
   font-size: 14px;
-  color: #555;
+  color: var(--color-text-primary);
 }
 
 .summary-row.total {
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 16px;
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px dashed #ddd;
+  border-top: 1px dashed var(--color-border-subtle);
 }
 
 .order-actions {
@@ -233,7 +233,7 @@
 
 .reorder-btn {
   background-color: var(--primary-color);
-  color: white;
+  color: var(--color-text-on-dark);
   border: none;
   padding: 10px 20px;
   border-radius: 4px;
@@ -243,7 +243,7 @@
 }
 
 .reorder-btn:hover {
-  background-color: #97815e;
+  background-color: var(--palette-dark-gray);
 }
 
 /* Reorder success notification */
@@ -260,7 +260,7 @@
 
 .success-icon {
   background-color: #4caf50;
-  color: white;
+  color: var(--color-text-on-dark);
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -279,7 +279,7 @@
 
 .view-cart-btn {
   background-color: #4caf50;
-  color: white;
+  color: var(--color-text-on-dark);
   border: none;
   border-radius: 4px;
   padding: 6px 12px;
@@ -292,7 +292,7 @@
 .close-notification {
   background: none;
   border: none;
-  color: #555;
+  color: var(--color-text-primary);
   font-size: 20px;
   cursor: pointer;
   padding: 0 4px;

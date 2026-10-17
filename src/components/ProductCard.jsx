@@ -4,6 +4,7 @@ import { motion as Motion, useReducedMotion } from "motion/react";
 import categoryIcon from "../assets/category-icon.png";
 import shareIcon from "../assets/share-icon.png";
 import { STOREFRONT_SCROLL_KEY } from "../hooks/useStorefrontScrollRestoration";
+import { getStockQuantity, isProductAvailable } from "../utils/inventory";
 
 const capitalizeWords = (value) => {
   if (!value) return "";
@@ -35,10 +36,8 @@ const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
   const [quantity, setQuantity] = useState(1);
-  const isAvailable = product.inStock !== false;
-  const stockLimit = Number(product.stock);
-  const maxQuantity =
-    Number.isFinite(stockLimit) && stockLimit > 0 ? stockLimit : Infinity;
+  const isAvailable = isProductAvailable(product);
+  const maxQuantity = getStockQuantity(product);
   const productUrl = `/product/?category=${encodeURIComponent(
     product.category || "Uncategorized"
   )}&pid=${product.id}`;
@@ -96,6 +95,7 @@ const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
           src={getProductImage(product)}
           alt={product.name || "Product Image"}
           className="grid-image"
+          loading="lazy"
           initial={
             prefersReducedMotion ? false : { opacity: 0, y: 8 }
           }

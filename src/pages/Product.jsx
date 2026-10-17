@@ -7,6 +7,7 @@ import "../styles/product.css";
 import logoImage from "../assets/lorislogo.png";
 import shareIcon from "../assets/share-icon.png";
 import categoryIcon from "../assets/category-icon.png";
+import { getStockQuantity, isProductAvailable } from "../utils/inventory";
 
 const Product = () => {
   // Use both route params (for backward compatibility) and search params
@@ -59,15 +60,19 @@ const Product = () => {
 
   // Update quantity
   const updateQuantity = (newQty) => {
-    if (newQty >= 1) {
+    if (newQty >= 1 && newQty <= getStockQuantity(product)) {
       setQuantity(newQty);
     }
   };
 
   // Add to cart
   const handleAddToCart = () => {
-    if (product) {
-      addToCart(product, quantity);
+    if (product && isProductAvailable(product)) {
+      const added = addToCart(product, quantity);
+      if (!added) {
+        setNotification({ visible: true, message: "This product is out of stock." });
+        return;
+      }
 
       setNotification({
         visible: true,
@@ -255,6 +260,9 @@ const Product = () => {
           <div className="product-page-price">
             {formatPrice(product.price)}
           </div>
+          <p className={`product-stock-status ${isProductAvailable(product) ? "in-stock" : "out-of-stock"}`}>
+            {isProductAvailable(product) ? `${getStockQuantity(product)} available` : "Out of Stock"}
+          </p>
 
           {product.description && (
             <div className="product-page-description">
@@ -280,12 +288,12 @@ const Product = () => {
               <div className="quantity-controls">
                 <button onClick={() => updateQuantity(quantity - 1)} disabled={quantity <= 1}>-</button>
                 <span>{quantity}</span>
-                <button onClick={() => updateQuantity(quantity + 1)}>+</button>
+                <button onClick={() => updateQuantity(quantity + 1)} disabled={quantity >= getStockQuantity(product)}>+</button>
               </div>
             </div>
 
-            <button className="add-to-cart-btn" onClick={handleAddToCart}>
-              Add to Cart
+            <button className="add-to-cart-btn" onClick={handleAddToCart} disabled={!isProductAvailable(product)}>
+              {isProductAvailable(product) ? "Add to Cart" : "Out of Stock"}
             </button>
 
             <button className="product-share-btn" onClick={handleShare}>

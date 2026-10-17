@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { db, auth } from "../../firebase/firebaseConfig";
 import { setDoc, doc, getDoc } from "firebase/firestore";
+import { getStockQuantity } from "../utils/inventory";
+import { normalizeKenyanPhone } from "../utils/phone";
 import emailjs from "@emailjs/browser";
 
 const Checkout = () => {
@@ -23,7 +25,6 @@ const Checkout = () => {
     removeFromCart: removeItem,
     clearCart,
   } = useCart();
-  const [emailStatus, setEmailStatus] = useState(null);
 
   const EMAILJS_SERVICE_ID = "service_dcl2ixr";
   const EMAILJS_TEMPLATE_ID = "template_n8yvs08";
@@ -81,11 +82,9 @@ const Checkout = () => {
       );
 
       console.log("Email sent successfully:", response);
-      setEmailStatus("success");
       return true;
     } catch (error) {
       console.error("Failed to send email:", error);
-      setEmailStatus("error");
       return false;
     }
   };
@@ -93,8 +92,17 @@ const Checkout = () => {
   const handleNormalOrder = async (orderId) => {
     try {
       setIsProcessing(true);
+      const stockChecks = await Promise.all(cartItems.map((item) => getDoc(doc(db, "products", item.id))));
+      const unavailable = stockChecks.find((snapshot, index) => (
+        !snapshot.exists() || getStockQuantity(snapshot.data()) < cartItems[index].quantity
+      ));
+      if (unavailable) {
+        throw new Error("One or more items are no longer available in the requested quantity.");
+      }
 
       const user = auth.currentUser;
+      const normalizedPhone = normalizeKenyanPhone(formData.phone, { allowInternational: false });
+      if (!normalizedPhone) throw new Error("Enter a Kenyan phone number starting with 07 or 01.");
 
       const orderData = {
         id: orderId,
@@ -113,7 +121,7 @@ const Checkout = () => {
         orderMethod: "website",
         shippingAddress: {
           fullName: formData.fullName,
-          phone: formData.phone,
+          phone: normalizedPhone,
           email: formData.email,
           notes: formData.deliveryNotes,
         },
@@ -144,7 +152,15 @@ const Checkout = () => {
     }
   };
 
-  const handleWhatsAppOrder = (orderId) => {
+  const handleWhatsAppOrder = async (orderId) => {
+    const stockChecks = await Promise.all(cartItems.map((item) => getDoc(doc(db, "products", item.id))));
+    const unavailable = stockChecks.find((snapshot, index) => (
+      !snapshot.exists() || getStockQuantity(snapshot.data()) < cartItems[index].quantity
+    ));
+    if (unavailable) {
+      alert("One or more items are no longer available in the requested quantity.");
+      return;
+    }
     let message = `Hello Loris Kenya, I would like to place an order (${orderId}):\n\n`;
 
     message += `*Order Details*\n`;

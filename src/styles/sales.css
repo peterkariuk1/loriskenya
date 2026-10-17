@@ -1,0 +1,59 @@
+@import "./App.css";
+
+.sales-page { max-width: 1500px; margin: 0 auto; }
+.sales-header { display: flex; justify-content: space-between; gap: 20px; align-items: center; margin-bottom: 20px; }
+.sales-header h2 { margin: 0 0 5px; }
+.sales-header p { margin: 0; color: #6b7280; }
+.receipt-toggle { display: flex; gap: 8px; align-items: center; font-weight: 600; }
+.sales-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(320px, .8fr); gap: 20px; align-items: start; }
+.sales-products, .sales-cart { background: var(--color-surface-primary); border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,.06); min-height: 0; max-height: calc(100vh - 32px); overflow-y: auto; overflow-x: hidden; scrollbar-gutter: stable; }
+.sales-toolbar { display: grid; gap: 14px; margin-bottom: 20px; }
+.sales-search { display: flex; align-items: center; gap: 10px; border: 1px solid var(--color-border-subtle); border-radius: 8px; padding: 0 12px; }
+.sales-search input { width: 100%; border: 0; outline: 0; padding: 12px 0; }
+.sales-categories { display: flex; gap: 8px; flex-wrap: wrap; }
+.sales-categories button, .sale-success button { border: 0; border-radius: 6px; padding: 8px 12px; cursor: pointer; background: var(--palette-light-gray); }
+.sales-categories button.active { background: var(--color-accent); color: var(--palette-near-black); }
+.sales-product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.sales-product-card { display: flex; flex-direction: column; gap: 6px; text-align: left; border: 1px solid var(--color-border-subtle); background: white; border-radius: 8px; padding: 10px; cursor: pointer; }
+.sales-product-card:disabled { opacity: .5; cursor: not-allowed; }
+.sales-product-card span:not(.sales-product-image), .sales-product-card small { color: #6b7280; }
+.sales-product-image { height: 110px; display: grid; place-items: center; background: var(--palette-light-gray); border-radius: 6px; overflow: hidden; font-size: .75rem; }
+.sales-product-image img { width: 100%; height: 100%; object-fit: contain; }
+.sales-cart { position: sticky; top: 16px; }
+.sales-cart h3 { display: flex; align-items: center; gap: 8px; margin-top: 0; }
+.customer-field { position: relative; display: grid; gap: 6px; margin-bottom: 18px; }
+.customer-field input { border: 1px solid var(--color-border-subtle); border-radius: 6px; padding: 11px; }
+.customer-suggestions { position: absolute; top: 66px; left: 0; right: 0; z-index: 2; background: white; border: 1px solid var(--color-border-subtle); border-radius: 6px; }
+.customer-suggestions button { display: grid; width: 100%; gap: 3px; text-align: left; border: 0; background: white; padding: 10px; cursor: pointer; }
+.customer-suggestions small { color: #6b7280; }
+.new-customer { display: grid; gap: 7px; padding: 10px; margin-top: 6px; border: 1px dashed var(--color-border-strong); border-radius: 6px; }
+.new-customer input, .new-customer button { padding: 9px; border: 1px solid var(--color-border-subtle); border-radius: 5px; }
+.new-customer button { background: var(--palette-light-gray); cursor: pointer; }
+.new-customer small { color: #6b7280; }
+.empty-sale { color: #6b7280; text-align: center; padding: 30px 0; }
+.sale-line { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--palette-light-gray); padding: 12px 0; }
+.sale-line > div:first-child { min-width: 0; display: grid; gap: 4px; }
+.sale-line span { color: #6b7280; font-size: .85rem; }
+.sale-line-controls { display: flex; align-items: center; gap: 6px; }
+.sale-line-controls button { display: grid; place-items: center; border: 1px solid var(--color-border-subtle); background: white; border-radius: 4px; min-width: 30px; min-height: 30px; cursor: pointer; }
+.payment-options { display: grid; gap: 8px; padding: 18px 0; }
+.payment-options button { border: 1px solid var(--color-border-subtle); background: white; border-radius: 6px; padding: 10px; cursor: pointer; }
+.payment-options button.active { border-color: var(--color-accent); background: #fff8e8; }
+.payment-options button span { margin-right: 8px; }
+.sale-total { display: flex; justify-content: space-between; padding: 16px 0; border-top: 1px solid var(--color-border-subtle); font-size: 1.15rem; }
+.discount-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; }
+.discount-field input { width: 80px; padding: 8px; border: 1px solid var(--color-border-subtle); border-radius: 5px; }
+.complete-sale-button { width: 100%; border: 0; background: var(--color-accent); color: var(--palette-near-black); border-radius: 7px; padding: 14px; font-weight: 700; cursor: pointer; }
+.complete-sale-button:disabled { opacity: .5; cursor: not-allowed; }
+.sales-message, .sale-success { display: flex; gap: 10px; align-items: center; padding: 12px 16px; margin-bottom: 16px; border-radius: 8px; }
+.sales-message.error { background: #fee2e2; color: #991b1b; }
+.sales-message.success, .sale-success { background: #dcfce7; color: #166534; }
+.sale-success button:first-of-type { margin-left: auto; }
+.sales-refresh-button, .receipt-action { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--color-border-subtle); background: white; border-radius: 6px; padding: 9px 12px; cursor: pointer; }
+.sales-history-table { overflow-x: auto; background: white; border-radius: 10px; }
+.sales-history-table table { width: 100%; border-collapse: collapse; min-width: 720px; }
+.sales-history-table th, .sales-history-table td { padding: 13px; text-align: left; border-bottom: 1px solid var(--palette-light-gray); }
+.sales-history-table td small { display: block; color: #6b7280; margin-top: 3px; }
+.receipt-action { color: var(--color-text-primary); }
+@media (max-width: 850px) { .sales-layout { grid-template-columns: 1fr; } .sales-cart { position: static; } }
+@media (max-width: 520px) { .sales-page { padding: 0 4px; } .sales-header { align-items: flex-start; flex-direction: column; } .sales-products, .sales-cart { padding: 14px; } .sales-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sale-line { align-items: flex-start; flex-direction: column; } .sale-line-controls { align-self: flex-end; } .sale-success { align-items: flex-start; flex-wrap: wrap; } .sale-success button:first-of-type { margin-left: 0; } }

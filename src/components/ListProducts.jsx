@@ -194,6 +194,7 @@ function ListProducts() {
                     <th>Product</th>
                     <th>Category</th>
                     <th>Price</th>
+                    <th>Quantity</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -215,6 +216,7 @@ function ListProducts() {
                       </td>
                       <td>{product.category || 'Uncategorized'}</td>
                       <td>{formatPrice(product.price)}</td>
+                      <td>{Number(product.stockQuantity) || 0} units</td>
                       <td>
                         <span className={`status-badge ${product.inStock ? 'in-stock' : 'out-of-stock'}`}>
                           {product.inStock ? 'In Stock' : 'Out of Stock'}

@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { auth, db } from "../../firebase/firebaseConfig.js";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { normalizeKenyanPhone } from "../utils/phone";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -45,6 +46,13 @@ const Register = () => {
     setIsLoading(true);
     setStatusMessage("");
     setStatusType("");
+    const normalizedPhone = normalizeKenyanPhone(phone, { allowInternational: false });
+    if (!normalizedPhone) {
+      setStatusType("error");
+      setStatusMessage("Enter a Kenyan number starting with 07 or 01, for example 0712345678.");
+      setIsLoading(false);
+      return;
+    }
     
     try {
       // Create user with email and password
@@ -56,7 +64,7 @@ const Register = () => {
         firstName,
         lastName,
         email: user.email,
-        phone,
+        phone: normalizedPhone,
         uid: user.uid,
         role: "customer", // Default role
         createdAt: serverTimestamp(),
@@ -142,7 +150,7 @@ const Register = () => {
           />
           <input 
             type="tel" 
-            placeholder="Enter your Phone Number" 
+            placeholder="Enter phone starting with 07 or 01"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />

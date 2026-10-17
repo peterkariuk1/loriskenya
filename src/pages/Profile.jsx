@@ -5,6 +5,7 @@ import { updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthPro
 import { FiLoader, FiEdit, FiSave, FiX, FiArrowLeft } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import '../styles/profile.css';
+import { normalizeKenyanPhone } from '../utils/phone';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -88,12 +89,18 @@ const Profile = () => {
 
     try {
       const currentUser = auth.currentUser;
+      const normalizedPhone = normalizeKenyanPhone(userData.phone, { allowInternational: false });
+      if (userData.phone && !normalizedPhone) {
+        setError('Enter a Kenyan number starting with 07 or 01.');
+        setUpdating(false);
+        return;
+      }
       
       // Update Firestore document with firstName and lastName
       await updateDoc(doc(db, "users", currentUser.uid), {
         firstName: userData.firstName,
         lastName: userData.lastName,
-        phone: userData.phone,
+        phone: normalizedPhone || '',
         updatedAt: new Date()
       });
       
@@ -253,7 +260,7 @@ const Profile = () => {
                 value={userData.phone}
                 onChange={handleChange}
                 disabled={!editMode}
-                placeholder="e.g., 0712345678"
+                placeholder="Start with 07 or 01, e.g. 0712345678"
               />
             </div>
 

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { db } from '../../firebase/firebaseConfig';
-import { collection, getDocs, updateDoc, doc, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, doc, query, orderBy, updateDoc } from 'firebase/firestore';
 import '../styles/update.css';
 import { FiSearch, FiEdit, FiCheck, FiX } from 'react-icons/fi';
+import { getStockQuantity, getStockLabel } from '../utils/inventory';
 
-function UpdateProducts() {
+function UpdateProducts({ onAddProduct }) {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +73,7 @@ function UpdateProducts() {
     setEditingProduct(product.id);
     setEditForm({
       price: product.price,
-      inStock: product.inStock
+      stockQuantity: getStockQuantity(product)
     });
   };
 
@@ -86,9 +87,11 @@ function UpdateProducts() {
   const handleSaveEdit = async (productId) => {
     try {
       const productRef = doc(db, 'products', productId);
+      const nextStock = Math.max(0, Number(editForm.stockQuantity) || 0);
       await updateDoc(productRef, {
         price: parseFloat(editForm.price),
-        inStock: editForm.inStock
+        inStock: nextStock > 0,
+        stockQuantity: nextStock
       });
 
       // Update local state
@@ -97,7 +100,8 @@ function UpdateProducts() {
           return {
             ...product,
             price: parseFloat(editForm.price),
-            inStock: editForm.inStock
+            inStock: Math.max(0, Number(editForm.stockQuantity) || 0) > 0,
+            stockQuantity: Math.max(0, Number(editForm.stockQuantity) || 0)
           };
         }
         return product;
@@ -108,29 +112,6 @@ function UpdateProducts() {
     } catch (err) {
       console.error("Error updating product:", err);
       alert("Failed to update product. Please try again.");
-    }
-  };
-
-  // Toggle product stock status
-  const toggleStockStatus = async (product) => {
-    try {
-      const productRef = doc(db, 'products', product.id);
-      await updateDoc(productRef, {
-        inStock: !product.inStock
-      });
-
-      // Update local state
-      const updatedProducts = products.map(p => {
-        if (p.id === product.id) {
-          return { ...p, inStock: !p.inStock };
-        }
-        return p;
-      });
-
-      setProducts(updatedProducts);
-    } catch (err) {
-      console.error("Error updating product stock status:", err);
-      alert("Failed to update stock status. Please try again.");
     }
   };
 
@@ -157,6 +138,7 @@ function UpdateProducts() {
         </div>
 
         <div className="update-actions">
+          {onAddProduct && <button type="button" className="upload-button" onClick={onAddProduct}>Add Product</button>}
           <div className="update-search-container">
             <input
               type="text"
@@ -207,6 +189,7 @@ function UpdateProducts() {
                 <th>Category</th>
                 <th>Price</th>
                 <th>Stock Status</th>
+                <th>Quantity</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -240,19 +223,27 @@ function UpdateProducts() {
                   </td>
                   <td>
                     {editingProduct === product.id ? (
-                      <label className="update-stock-toggle">
-                        <input
-                          type="checkbox"
-                          name="inStock"
-                          checked={editForm.inStock}
-                          onChange={handleFormChange}
-                        />
-                        <span>{editForm.inStock ? 'In Stock' : 'Out of Stock'}</span>
-                      </label>
-                    ) : (
-                      <span className={`update-status-badge ${product.inStock ? 'in-stock' : 'out-stock'}`}>
-                        {product.inStock ? 'In Stock' : 'Out of Stock'}
+                      <span className={`update-status-badge ${getStockQuantity(product) > 0 ? 'in-stock' : 'out-stock'}`}>
+                        {getStockLabel({ ...product, stockQuantity: editForm.stockQuantity })}
                       </span>
+                    ) : (
+                      <span className={`update-status-badge ${getStockQuantity(product) > 0 ? 'in-stock' : 'out-stock'}`}>
+                        {getStockLabel(product)}
+                      </span>
+                    )}
+                  </td>
+                  <td>
+                    {editingProduct === product.id ? (
+                      <input
+                        type="number"
+                        min="0"
+                        name="stockQuantity"
+                        value={editForm.stockQuantity}
+                        onChange={handleFormChange}
+                        className="update-edit-input"
+                      />
+                    ) : (
+                      `${Number(product.stockQuantity) || 0} units`
                     )}
                   </td>
                   <td className="update-actions-cell">
@@ -278,12 +269,6 @@ function UpdateProducts() {
                           onClick={() => handleEdit(product)}
                         >
                           <FiEdit /> Edit
-                        </button>
-                        <button
-                          className="update-action-btn update-stock-btn"
-                          onClick={() => toggleStockStatus(product)}
-                        >
-                          {product.inStock ? 'Mark Out' : 'Mark In'}
                         </button>
                       </>
                     )}

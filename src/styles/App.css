@@ -32,6 +32,13 @@
   --font-primary: "Ubuntu Sans", sans-serif;
   --font-luxury: "Prata", serif;
 }
+html,
+body,
+#root {
+  min-width: 100%;
+  overflow-x: auto;
+}
+
 body{
   margin: 0;
   font-family: var(--font-primary);

@@ -102,7 +102,6 @@ const Footer = () => {
 
       <div className="footer-main">
         <div className="footer-brand">
-          <img src={logoImage} alt="Loris Kenya" className="footer-logo" />
           <h3>Loris Kenya</h3>
           <p>Curating timeless scents that speak louder than words, designed for every season and every story.</p>
           <div className="footer-socials">

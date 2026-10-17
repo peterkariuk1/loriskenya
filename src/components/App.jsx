@@ -12,7 +12,6 @@ import Checkout from "../pages/Checkout.jsx";
 import Product from "../pages/Product.jsx";
 import OrderSuccess from "../pages/OrderSuccess.jsx";
 import Orders from "../pages/Orders.jsx";
-import { bannerImages } from "../components/BannerImages.jsx";
 import Loader from "../components/Loader.jsx";
 import NotFound from "../pages/NotFound.jsx";
 import Maintenance from "../pages/Maintenance.jsx";
@@ -30,11 +29,14 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const firstImage = new Image();
-    firstImage.src = bannerImages[0]?.url;
-  
-    firstImage.onload = () => {
-      setIsLoading(false);
+    let timeoutId;
+    const frameId = window.requestAnimationFrame(() => {
+      timeoutId = window.setTimeout(() => setIsLoading(false), 120);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(timeoutId);
     };
   }, []);
 

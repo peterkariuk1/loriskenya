@@ -4,7 +4,8 @@ import {
   FiArrowRight, FiEye, FiAlertCircle, FiCalendar, FiLoader
 } from 'react-icons/fi';
 import { db } from '../../firebase/firebaseConfig';
-import { collection, getDocs, query, orderBy, where } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { getStockQuantity } from '../utils/inventory';
 import '../styles/dashboard.css';
 
 const Dashboard = ({ onNavigateToTab }) => {
@@ -33,15 +34,15 @@ const Dashboard = ({ onNavigateToTab }) => {
         setLoading(true);
 
         // Fetch order data for revenue and order count
-        const ordersQuery = query(
-          collection(db, 'orders'),
-          orderBy('createdAt', 'desc')
-        );
-        const ordersSnapshot = await getDocs(ordersQuery);
+        const ordersSnapshot = await getDocs(collection(db, 'orders'));
         const ordersData = ordersSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
-        }));
+        })).sort((first, second) => {
+          const firstDate = first.createdAt?.toDate ? first.createdAt.toDate().getTime() : new Date(first.createdAt || 0).getTime();
+          const secondDate = second.createdAt?.toDate ? second.createdAt.toDate().getTime() : new Date(second.createdAt || 0).getTime();
+          return secondDate - firstDate;
+        });
 
         // Calculate revenue from orders
         const totalRevenue = ordersData.reduce((sum, order) => {
@@ -51,8 +52,8 @@ const Dashboard = ({ onNavigateToTab }) => {
         // Get recent orders (last 5)
         const recentOrdersData = ordersData.slice(0, 5).map(order => ({
           id: order.orderNumber || order.id,
-          customer: order.shippingAddress.fullName || 'Anonymous',
-          date: order.createdAt ? new Date(order.createdAt.toDate()).toISOString().split('T')[0] : 'Unknown',
+          customer: order.shippingAddress?.fullName || order.customerName || 'Anonymous',
+          date: order.createdAt?.toDate ? order.createdAt.toDate().toISOString().split('T')[0] : (order.createdAt ? new Date(order.createdAt).toISOString().split('T')[0] : 'Unknown'),
           total: `KSh ${parseFloat(order.total).toLocaleString()}`,
           status: order.status || 'Processing'
         }));
@@ -76,7 +77,7 @@ const Dashboard = ({ onNavigateToTab }) => {
 
         // Identify low stock products (for alerts)
         const lowStockProducts = productsData.filter(product =>
-          product.inStock === false || (product.stockLevel && product.stockLevel < 5)
+          getStockQuantity(product) < 5
         );
 
         // Calculate top selling products based on orders
@@ -87,7 +88,7 @@ const Dashboard = ({ onNavigateToTab }) => {
           // Only process orders with items
           if (order.items && Array.isArray(order.items)) {
             order.items.forEach(item => {
-              const productId = item.productId;
+              const productId = item.productId || item.id;
               const quantity = item.quantity || 1;
               const price = item.price || 0;
 
@@ -132,11 +133,10 @@ const Dashboard = ({ onNavigateToTab }) => {
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-        const newCustomersQuery = query(
+        const newCustomersSnapshot = await getDocs(query(
           collection(db, 'users'),
           where('createdAt', '>=', oneWeekAgo)
-        );
-        const newCustomersSnapshot = await getDocs(newCustomersQuery);
+        ));
         const newCustomersCount = newCustomersSnapshot.size;
 
         if (newCustomersCount > 0) {

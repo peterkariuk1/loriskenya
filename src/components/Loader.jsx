@@ -1,19 +1,6 @@
 import "../styles/loader.css";
-import loaderAnimation from "../assets/loadervideo.webm";
-const Loader = () => {
-  return (
-    <div className="loader-container">
-      <video
-        src={loaderAnimation}
-        muted
-        autoPlay
-        loop
-        onCanPlayThrough={(e) => e.target.play()}
-        playsInline
-      ></video>
-      <p className="preloader-tagline">Luxury scents, redefined</p>{" "}
-    </div>
-  );
-};
+import StorefrontSkeleton from "./StorefrontSkeleton";
+
+const Loader = () => <StorefrontSkeleton fullPage />;
 
 export default Loader;

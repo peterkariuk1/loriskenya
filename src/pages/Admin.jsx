@@ -7,14 +7,15 @@ import { doc, getDoc } from "firebase/firestore";
 import {
   FiMenu, FiX, FiHome, FiShoppingBag, FiUsers, FiPackage,
   FiLogOut, FiChevronLeft, FiChevronRight,
-  FiChevronDown, FiList, FiPlus, FiEdit, FiLoader
+  FiList, FiLoader
 } from "react-icons/fi";
 import logoImage from "../assets/lorislogo.png";
 import AdminOrders from "../components/AdminOrders";
-import UploadProducts from "../components/UploadProducts";
 import UpdateProducts from "../components/UpdateProducts";
+import UploadProducts from "../components/UploadProducts";
 import Customers from "../components/Customers";
-import ListProducts from "../components/ListProducts";
+import Sales from "../components/Sales";
+import AllSales from "../components/AllSales";
 import Dashboard from "../components/Dashboard";
 import { Helmet } from 'react-helmet'
 
@@ -22,11 +23,10 @@ const Admin = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [activeSubTab, setActiveSubTab] = useState("");
-  const [openDropdown, setOpenDropdown] = useState(null);
   const [logoutLoading, setLogoutLoading] = useState(false); // Track logout state
   const [authChecking, setAuthChecking] = useState(true);
   const [authError, setAuthError] = useState(null);
+  const [showProductUpload, setShowProductUpload] = useState(false);
 
   const navigate = useNavigate();
 
@@ -116,15 +116,9 @@ const Admin = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  // Toggle dropdown menu
-  const toggleDropdown = (dropdown) => {
-    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
-  };
-
   // Handle navigation tab change
-  const handleTabChange = (tab, subTab = "") => {
+  const handleTabChange = (tab) => {
     setActiveTab(tab);
-    setActiveSubTab(subTab);
     if (window.innerWidth < 992) {
       setMobileOpen(false);
     }
@@ -137,13 +131,14 @@ const Admin = () => {
         return <Dashboard onNavigateToTab={handleTabChange} />;
       case "orders":
         return <AdminOrders isAdmin={true} />;
+      case "sales":
+        return <Sales />;
+      case "all-sales":
+        return <AllSales />;
       case "products":
-        if (activeSubTab === "add") {
-          return <UploadProducts />;
-        } else if (activeSubTab === "update") {
-          return <UpdateProducts />;
-        }
-        return <ListProducts />;
+        return showProductUpload
+          ? <><button type="button" className="admin-back-button" onClick={() => setShowProductUpload(false)}>Back to Products</button><UploadProducts /></>
+          : <UpdateProducts onAddProduct={() => setShowProductUpload(true)} />;
       case "customers":
         return <Customers />;
       default:
@@ -223,44 +218,26 @@ const Admin = () => {
                   <span>Orders</span>
                 </button>
               </li>
+              <li className={activeTab === "sales" ? "active" : ""}>
+                <button onClick={() => handleTabChange("sales")}>
+                  <FiShoppingBag size={18} />
+                  <span>Sales / POS</span>
+                </button>
+              </li>
+              <li className={activeTab === "all-sales" ? "active" : ""}>
+                <button onClick={() => handleTabChange("all-sales")}>
+                  <FiList size={18} />
+                  <span>All Sales</span>
+                </button>
+              </li>
 
-              {/* Products with dropdown */}
               <li className={activeTab === "products" ? "active" : ""}>
                 <button
-                  className={`dropdown-toggle ${openDropdown === "products" ? "open" : ""}`}
-                  onClick={() => toggleDropdown("products")}
+                  onClick={() => handleTabChange("products")}
                 >
                   <FiPackage size={18} />
                   <span>Products</span>
-                  <FiChevronDown
-                    size={16}
-                    className="dropdown-icon"
-                  />
                 </button>
-
-                {/* Dropdown menu */}
-                {openDropdown === "products" && (
-                  <ul className="dropdown-menu">
-                    <li className={activeSubTab === "" ? "active-subtab" : ""}>
-                      <button onClick={() => handleTabChange("products", "")}>
-                        <FiList size={18} />
-                        <span>All Products</span>
-                      </button>
-                    </li>
-                    <li className={activeSubTab === "add" ? "active-subtab" : ""}>
-                      <button onClick={() => handleTabChange("products", "add")}>
-                        <FiPlus size={14} />
-                        <span>Add Product</span>
-                      </button>
-                    </li>
-                    <li className={activeSubTab === "update" ? "active-subtab" : ""}>
-                      <button onClick={() => handleTabChange("products", "update")}>
-                        <FiEdit size={14} />
-                        <span>Update Products</span>
-                      </button>
-                    </li>
-                  </ul>
-                )}
               </li>
 
               <li className={activeTab === "customers" ? "active" : ""}>

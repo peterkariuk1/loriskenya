@@ -29,9 +29,7 @@ const Banner = () => {
         <div
           key={index}
           className={`banner-slide ${index === activeIndex ? "active" : ""}`}
-          style={{
-            backgroundImage: `url(${img.url})`,
-          }}
+          style={index === activeIndex ? { backgroundImage: `url(${img.url})` } : undefined}
         >
           <div className={`banner-overlay ${img.theme}-text`}>
             <h1>{img.text1}</h1>

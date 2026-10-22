@@ -14,6 +14,8 @@ import instagramIcon from "../assets/ig.png";
 import whatsappIcon from "../assets/wapp.png";
 import newsletterImage from "../assets/oudperfume.jpeg";
 import newsletterVideo from "../assets/loris_footer.mp4";
+import { FaExternalLinkAlt } from "react-icons/fa";
+
 
 const mapsUrl = "https://maps.app.goo.gl/eo7fAai59BYPWZGr6";
 const mapsEmbedUrl = "https://www.google.com/maps?q=Loris+Parfum%2C+-1.2812723%2C36.8185782&output=embed";
@@ -33,7 +35,7 @@ const Footer = () => {
     if (!video || prefersReducedMotion) return;
 
     video.muted = true;
-    video.play().catch(() => {});
+    video.play().catch(() => { });
   }, []);
 
   const handleNewsletterSubmit = async (event) => {
@@ -182,7 +184,7 @@ const Footer = () => {
 
       <div className="footer-bottom">
         <span>Copyright © {new Date().getFullYear()} Loris Kenya.</span>
-        <span>Made for memorable moments.</span>
+        <a className="kariuki_link" href="https://wa.me/254112529019"><span>Developed by Peter Kariuki <FaExternalLinkAlt /></span></a>
       </div>
     </footer>
   );

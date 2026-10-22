@@ -31,6 +31,7 @@
 
 .newsletter-image-wrap {
   min-height: 250px;
+  max-height: 380px;
   background: #d7b06b;
 }
 
@@ -270,13 +271,17 @@
 }
 
 .footer-bottom {
+  padding: 18px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.footer-bottom,
+.kariuki_link {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.55);
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  padding: 18px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.78rem;
 }
 
 .sr-only {

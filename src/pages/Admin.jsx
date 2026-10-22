@@ -17,7 +17,6 @@ import Customers from "../components/Customers";
 import Sales from "../components/Sales";
 import AllSales from "../components/AllSales";
 import Dashboard from "../components/Dashboard";
-import ProductVectorSync from "../components/ProductVectorSync";
 import { Helmet } from 'react-helmet'
 
 const Admin = () => {
@@ -139,7 +138,7 @@ const Admin = () => {
       case "products":
         return showProductUpload
           ? <><button type="button" className="admin-back-button" onClick={() => setShowProductUpload(false)}>Back to Products</button><UploadProducts /></>
-          : <><ProductVectorSync /><UpdateProducts onAddProduct={() => setShowProductUpload(true)} /></>;
+          : <UpdateProducts onAddProduct={() => setShowProductUpload(true)} />;
       case "customers":
         return <Customers />;
       default:

@@ -6,6 +6,8 @@ import EditorialHeading from "./EditorialHeading";
 import { useCart } from "../context/CartContext.jsx";
 import { db } from "../../firebase/firebaseConfig.js";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { rankProducts } from "../utils/personalizationRanking.js";
+import { recordAddToCart } from "../utils/personalizationStore.js";
 
 const BestSellerGrid = () => {
   // State for products
@@ -47,8 +49,9 @@ const BestSellerGrid = () => {
           ...doc.data()
         }));
         
-        setProducts(bestSellerProducts);
-        setVisibleProducts(bestSellerProducts.slice(0, visibleCount));
+        const rankedProducts = rankProducts(bestSellerProducts);
+        setProducts(rankedProducts);
+        setVisibleProducts(rankedProducts.slice(0, visibleCount));
         setIsAllLoaded(visibleCount >= bestSellerProducts.length);
         
         console.log("Total Best Seller Products:", bestSellerProducts.length);
@@ -129,6 +132,7 @@ const BestSellerGrid = () => {
 
   // Quick add to cart function
   const quickAddToCart = (product, qty = 1) => {
+    recordAddToCart(product);
     addToCart(product, qty);
     showNotification(product, qty);
   };

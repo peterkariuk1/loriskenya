@@ -8,6 +8,7 @@ import LadiesGrid from "../components/LadiesGrid.jsx";
 import Footer from "../components/Footer.jsx";
 import { Helmet } from "react-helmet";
 import { useStorefrontScrollRestoration } from "../hooks/useStorefrontScrollRestoration";
+import { getSectionOrder } from "../utils/personalizationRanking.js";
 
 const Home = () => {
   const location = useLocation();
@@ -28,10 +29,11 @@ const Home = () => {
         <Header />
         <Banner />
         <Categories />
-        {/* Added different categorised grids */}
-        <BestSellerGrid />
-        <LadiesGrid />
-        <MensGrid />
+        {getSectionOrder().map((section) => {
+          if (section === "bestSellers") return <BestSellerGrid key={section} />;
+          if (section === "ladies") return <LadiesGrid key={section} />;
+          return <MensGrid key={section} />;
+        })}
 
         <Link to="/all-products">
           <button

@@ -6,6 +6,8 @@ import EditorialHeading from "./EditorialHeading";
 import { useCart } from "../context/CartContext.jsx";
 import { db } from "../../firebase/firebaseConfig.js";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { rankProducts } from "../utils/personalizationRanking.js";
+import { recordAddToCart } from "../utils/personalizationStore.js";
 
 const MenPerfumes = () => {
   // State for products
@@ -47,8 +49,9 @@ const MenPerfumes = () => {
           ...doc.data(),
         }));
 
-        setProducts(menProducts);
-        setVisibleProducts(menProducts.slice(0, visibleCount));
+        const rankedProducts = rankProducts(menProducts);
+        setProducts(rankedProducts);
+        setVisibleProducts(rankedProducts.slice(0, visibleCount));
         setIsAllLoaded(visibleCount >= menProducts.length);
 
         console.log("Total Men's Products:", menProducts.length);
@@ -131,6 +134,7 @@ const MenPerfumes = () => {
 
   // Quick add to cart function
   const quickAddToCart = (product, qty = 1) => {
+    recordAddToCart(product);
     addToCart(product, qty);
     showNotification(product, qty);
   };

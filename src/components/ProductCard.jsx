@@ -5,6 +5,7 @@ import categoryIcon from "../assets/category-icon.png";
 import shareIcon from "../assets/share-icon.png";
 import { STOREFRONT_SCROLL_KEY } from "../hooks/useStorefrontScrollRestoration";
 import { getStockQuantity, isProductAvailable } from "../utils/inventory";
+import { recordClick } from "../utils/personalizationStore.js";
 
 const capitalizeWords = (value) => {
   if (!value) return "";
@@ -43,6 +44,7 @@ const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
   )}&pid=${product.id}`;
 
   const openDetails = () => {
+    recordClick(product);
     sessionStorage.setItem(
       STOREFRONT_SCROLL_KEY,
       JSON.stringify({

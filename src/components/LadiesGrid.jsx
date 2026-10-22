@@ -5,6 +5,8 @@ import ProductCard from "./ProductCard";
 import { useCart } from "../context/CartContext.jsx";
 import { db } from "../../firebase/firebaseConfig.js";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { rankProducts } from "../utils/personalizationRanking.js";
+import { recordAddToCart } from "../utils/personalizationStore.js";
 
 const LadiesGrid = () => {
   // State for products
@@ -46,8 +48,9 @@ const LadiesGrid = () => {
           ...doc.data()
         }));
         
-        setProducts(womenProducts);
-        setVisibleProducts(womenProducts.slice(0, visibleCount));
+        const rankedProducts = rankProducts(womenProducts);
+        setProducts(rankedProducts);
+        setVisibleProducts(rankedProducts.slice(0, visibleCount));
         setIsAllLoaded(visibleCount >= womenProducts.length);
         
         console.log("Total Women's Products:", womenProducts.length);
@@ -128,6 +131,7 @@ const LadiesGrid = () => {
 
   // Quick add to cart function
   const quickAddToCart = (product, qty = 1) => {
+    recordAddToCart(product);
     addToCart(product, qty);
     showNotification(product, qty);
   };

@@ -8,6 +8,8 @@ import { useCart } from "../context/CartContext";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { FiArrowLeft } from 'react-icons/fi';
 import { STOREFRONT_SCROLL_KEY } from "../hooks/useStorefrontScrollRestoration";
+import { isDefaultGridSort, rankProducts } from "../utils/personalizationRanking.js";
+import { recordAddToCart } from "../utils/personalizationStore.js";
 
 const Grid = () => {
   const [products, setProducts] = useState([]);
@@ -98,6 +100,7 @@ const Grid = () => {
   const handleAddToCart = () => {
     if (selectedProduct && selectedProduct.inStock !== false) {
       // Add the selected product with quantity
+      recordAddToCart(selectedProduct);
       addToCart(selectedProduct, quantity);
 
       // Show notification
@@ -110,6 +113,7 @@ const Grid = () => {
 
   // Quick add to cart function
   const quickAddToCart = (product, qty = 1) => {
+    recordAddToCart(product);
     addToCart(product, qty);
     showNotification(product, qty);
   };
@@ -339,7 +343,10 @@ const Grid = () => {
 
   // Calculate which products to display based on current page
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const visibleProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+  const rankedProducts = isDefaultGridSort({ sortBy, searchQuery, category })
+    ? rankProducts(filteredProducts)
+    : filteredProducts;
+  const visibleProducts = rankedProducts.slice(startIndex, startIndex + itemsPerPage);
 
   // Page navigation
   const goToPage = (pageNum) => {

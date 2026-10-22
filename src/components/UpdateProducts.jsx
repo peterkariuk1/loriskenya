@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { db } from '../../firebase/firebaseConfig';
-import { collection, getDocs, doc, query, orderBy, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, query, orderBy, updateDoc, serverTimestamp } from 'firebase/firestore';
 import '../styles/update.css';
 import { FiSearch, FiEdit, FiCheck, FiX } from 'react-icons/fi';
 import { getStockQuantity, getStockLabel } from '../utils/inventory';
+import { buildProductVector, VECTOR_VERSION } from '../utils/productVector.js';
 
 function UpdateProducts({ onAddProduct }) {
   const [products, setProducts] = useState([]);
@@ -88,11 +89,22 @@ function UpdateProducts({ onAddProduct }) {
     try {
       const productRef = doc(db, 'products', productId);
       const nextStock = Math.max(0, Number(editForm.stockQuantity) || 0);
-      await updateDoc(productRef, {
+      const updates = {
         price: parseFloat(editForm.price),
         inStock: nextStock > 0,
         stockQuantity: nextStock
-      });
+      };
+      try {
+        updates.vec = buildProductVector({
+          ...products.find((product) => product.id === productId),
+          price: updates.price,
+        });
+        updates.vecVersion = VECTOR_VERSION;
+        updates.vecUpdatedAt = serverTimestamp();
+      } catch (error) {
+        console.warn("Product vector could not be computed during update.", error);
+      }
+      await updateDoc(productRef, updates);
 
       // Update local state
       const updatedProducts = products.map(product => {

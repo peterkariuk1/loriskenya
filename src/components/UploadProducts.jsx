@@ -6,8 +6,9 @@ import { MdOutlineInventory2, MdOutlineSell } from "react-icons/md";
 import { BsGenderAmbiguous } from "react-icons/bs";
 import { TbCategory } from "react-icons/tb";
 import { db } from "../../firebase/firebaseConfig";
-import { collection, addDoc, getDocs, query, where, Timestamp } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, Timestamp, serverTimestamp } from "firebase/firestore";
 import axios from "axios";
+import { buildProductVector, VECTOR_VERSION } from "../utils/productVector.js";
 
 const BACKEND_URL = "https://loriskenya-backend.onrender.com/api";
 
@@ -232,6 +233,13 @@ const UploadProducts = () => {
         createdAt: Timestamp.now()
       };
       
+      try {
+        productData.vec = buildProductVector(productData);
+        productData.vecVersion = VECTOR_VERSION;
+        productData.vecUpdatedAt = serverTimestamp();
+      } catch (error) {
+        console.warn("Product vector could not be computed during upload.", error);
+      }
       await addDoc(collection(db, "products"), productData);
       
       // Success!

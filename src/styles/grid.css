@@ -74,13 +74,14 @@
   column-gap: 15px;
   row-gap: 25px;
   margin-bottom: 20px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .product-card {
   display: flex;
   flex-direction: column;
-  align-self: start;
+  align-self: stretch;
+  height: 100%;
   min-width: 0;
   padding: 0;
   overflow: visible;
@@ -180,6 +181,12 @@
   line-height: 1.35;
   text-align: left;
   overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  height: 2.7em;
+  overflow: hidden;
 }
 
 .product-card .category-name {

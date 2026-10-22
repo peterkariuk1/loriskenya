@@ -124,7 +124,7 @@ const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
             <span className="product-discount-badge">{product.discount}% off</span>
           )}
         </div>
-        <h3 className="grid-name">{capitalizeWords(product.name)}</h3>
+        <h3 className="grid-name" title={product.name || ""}>{capitalizeWords(product.name)}</h3>
         <p className="category-name">
           <img src={categoryIcon} alt="" aria-hidden="true" />
           {product.category || "Uncategorized"}

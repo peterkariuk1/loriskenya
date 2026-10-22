@@ -1,5 +1,5 @@
 import "../styles/footer.css";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig.js";
@@ -13,7 +13,7 @@ import cashIcon from "../assets/cash.png";
 import instagramIcon from "../assets/ig.png";
 import whatsappIcon from "../assets/wapp.png";
 import newsletterImage from "../assets/oudperfume.jpeg";
-import logoImage from "../assets/lorislogo.png";
+import newsletterVideo from "../assets/loris_footer.mp4";
 
 const mapsUrl = "https://maps.app.goo.gl/eo7fAai59BYPWZGr6";
 const mapsEmbedUrl = "https://www.google.com/maps?q=Loris+Parfum%2C+-1.2812723%2C36.8185782&output=embed";
@@ -22,6 +22,19 @@ const Footer = () => {
   const [email, setEmail] = useState("");
   const [subscriptionState, setSubscriptionState] = useState("idle");
   const [subscriptionMessage, setSubscriptionMessage] = useState("");
+  const [shouldAutoplayVideo, setShouldAutoplayVideo] = useState(false);
+  const newsletterVideoRef = useRef(null);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setShouldAutoplayVideo(!prefersReducedMotion);
+
+    const video = newsletterVideoRef.current;
+    if (!video || prefersReducedMotion) return;
+
+    video.muted = true;
+    video.play().catch(() => {});
+  }, []);
 
   const handleNewsletterSubmit = async (event) => {
     event.preventDefault();
@@ -64,7 +77,20 @@ const Footer = () => {
     <footer className="site-footer">
       <section className="newsletter-banner" aria-labelledby="newsletter-title">
         <div className="newsletter-image-wrap">
-          <img src={newsletterImage} alt="Loris fragrance collection" />
+          <video
+            ref={newsletterVideoRef}
+            autoPlay={shouldAutoplayVideo}
+            muted
+            loop
+            playsInline
+            preload="auto"
+            disablePictureInPicture
+            tabIndex={-1}
+            aria-hidden="true"
+            poster={newsletterImage}
+          >
+            <source src={newsletterVideo} type="video/mp4" />
+          </video>
         </div>
         <div className="newsletter-content">
           <p className="footer-eyebrow">The Loris Edit</p>

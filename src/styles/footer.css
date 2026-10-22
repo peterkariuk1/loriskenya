@@ -34,10 +34,11 @@
   background: #d7b06b;
 }
 
-.newsletter-image-wrap img {
+.newsletter-image-wrap video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .newsletter-content {

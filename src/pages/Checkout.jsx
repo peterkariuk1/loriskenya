@@ -8,7 +8,6 @@ import { setDoc, doc, getDoc } from "firebase/firestore";
 import { getStockQuantity } from "../utils/inventory";
 import { normalizeKenyanPhone } from "../utils/phone";
 import emailjs from "@emailjs/browser";
-import { useVisitor } from "../context/VisitorContext";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -26,7 +25,6 @@ const Checkout = () => {
     removeFromCart: removeItem,
     clearCart,
   } = useCart();
-  const { trackPurchase } = useVisitor();
 
   const EMAILJS_SERVICE_ID = "service_dcl2ixr";
   const EMAILJS_TEMPLATE_ID = "template_n8yvs08";
@@ -142,7 +140,6 @@ const Checkout = () => {
 
       await sendOrderConfirmationEmail(orderData);
 
-      cartItems.forEach((item) => trackPurchase(item));
       clearCart();
 
       navigate(`/order-success?orderId=${orderId}`);

@@ -1,5 +1,5 @@
 import "../styles/grid.css";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import shareIcon from "../assets/share-icon.png";
 import ProductCard from "./ProductCard";
 import { db } from "../../firebase/firebaseConfig.js";
@@ -8,8 +8,6 @@ import { useCart } from "../context/CartContext";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { FiArrowLeft } from 'react-icons/fi';
 import { STOREFRONT_SCROLL_KEY } from "../hooks/useStorefrontScrollRestoration";
-import { useVisitor } from "../context/VisitorContext";
-import { rankProducts } from "../utils/personalization";
 
 const Grid = () => {
   const [products, setProducts] = useState([]);
@@ -31,10 +29,8 @@ const Grid = () => {
   });
   const gridRef = useRef(null);
   const previousCategory = useRef(null);
-  const rankingSnapshot = useRef({ key: "", products: [] });
 
   const { addToCart } = useCart();
-  const { profile, sessionId, optedOut } = useVisitor();
 
   // Add search params from URL
   const [searchParams] = useSearchParams();
@@ -332,27 +328,18 @@ const Grid = () => {
     return true;
   });
 
-  const rankedProducts = useMemo(() => {
-    if (sortBy !== "newest" || optedOut || !profile || !sessionId) return filteredProducts;
-    const key = `${sortBy}|${filteredProducts.map((product) => product.id).join(",")}|${profile.visitorId}`;
-    if (rankingSnapshot.current.key === key) return rankingSnapshot.current.products;
-    const ranked = rankProducts(filteredProducts, profile, sessionId);
-    rankingSnapshot.current = { key, products: ranked };
-    return ranked;
-  }, [filteredProducts, profile, sessionId, optedOut, sortBy]);
-
   // Calculate total pages based on filtered products
   useEffect(() => {
-    const total = Math.ceil(rankedProducts.length / itemsPerPage);
+    const total = Math.ceil(filteredProducts.length / itemsPerPage);
     setTotalPages(total);
 
     // Reset to page 1 when filters change
     setCurrentPage(1);
-  }, [rankedProducts.length]);
+  }, [filteredProducts.length]);
 
   // Calculate which products to display based on current page
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const visibleProducts = rankedProducts.slice(startIndex, startIndex + itemsPerPage);
+  const visibleProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
   // Page navigation
   const goToPage = (pageNum) => {

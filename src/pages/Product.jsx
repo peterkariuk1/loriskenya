@@ -8,7 +8,6 @@ import logoImage from "../assets/lorislogo.png";
 import shareIcon from "../assets/share-icon.png";
 import categoryIcon from "../assets/category-icon.png";
 import { getStockQuantity, isProductAvailable } from "../utils/inventory";
-import { useVisitor } from "../context/VisitorContext";
 
 const Product = () => {
   // Use both route params (for backward compatibility) and search params
@@ -19,7 +18,6 @@ const Product = () => {
 
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { trackDwell } = useVisitor();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,29 +27,6 @@ const Product = () => {
     message: '',
   });
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-
-  useEffect(() => {
-    if (!product) return undefined;
-    let startedAt = document.hidden ? null : Date.now();
-    let dwellMs = 0;
-    const pause = () => {
-      if (startedAt) dwellMs += Date.now() - startedAt;
-      startedAt = null;
-    };
-    const resume = () => {
-      if (!document.hidden && !startedAt) startedAt = Date.now();
-    };
-    const handleVisibility = () => {
-      if (document.hidden) pause();
-      else resume();
-    };
-    document.addEventListener("visibilitychange", handleVisibility);
-    return () => {
-      pause();
-      document.removeEventListener("visibilitychange", handleVisibility);
-      trackDwell(product, dwellMs);
-    };
-  }, [product, trackDwell]);
 
   // Fetch product data
   useEffect(() => {

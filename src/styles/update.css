@@ -158,6 +158,30 @@
   font-family: var(--font-primary);
 }
 
+.update-description-input {
+  display: block;
+  width: 260px;
+  max-width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+  font: inherit;
+  resize: vertical;
+}
+
+.update-description-count,
+.update-description-warning {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.update-description-warning,
+.update-description-count.warning {
+  color: #c62828;
+}
+
 /* Status badge */
 .update-status-badge {
   display: inline-block;

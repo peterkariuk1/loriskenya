@@ -9,6 +9,11 @@ import { db } from "../../firebase/firebaseConfig";
 import { collection, addDoc, getDocs, query, where, Timestamp, serverTimestamp } from "firebase/firestore";
 import axios from "axios";
 import { buildProductVector, VECTOR_VERSION } from "../utils/productVector.js";
+import {
+  countDescriptionWords,
+  DESCRIPTION_WORD_LIMIT,
+  trimDescriptionToLimit,
+} from "../utils/description.js";
 
 const BACKEND_URL = "https://loriskenya-backend.onrender.com/api";
 
@@ -78,9 +83,12 @@ const UploadProducts = () => {
   // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    const nextValue = name === "description" && countDescriptionWords(value) > DESCRIPTION_WORD_LIMIT
+      ? trimDescriptionToLimit(value)
+      : value;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : nextValue
     }));
     
     // Clear error when field is updated
@@ -150,6 +158,9 @@ const UploadProducts = () => {
     if (!formData.quantities.trim()) errors.quantities = "Quantity is required";
     if (!formData.price || formData.price <= 0) errors.price = "Valid price is required";
     if (!formData.description.trim()) errors.description = "Description is required";
+    if (countDescriptionWords(formData.description) > DESCRIPTION_WORD_LIMIT) {
+      errors.description = `Description must be ${DESCRIPTION_WORD_LIMIT} words or fewer`;
+    }
     if (!formData.category) errors.category = "Category is required";
     if (!formData.image) errors.image = "Product image is required";
     
@@ -406,6 +417,9 @@ const UploadProducts = () => {
                   rows="4"
                   className={formErrors.description ? 'error' : ''}
                 ></textarea>
+                <p className="input-help">
+                  {countDescriptionWords(formData.description)}/{DESCRIPTION_WORD_LIMIT} words
+                </p>
                 {formErrors.description && <div className="error-message">{formErrors.description}</div>}
               </div>
             </div>

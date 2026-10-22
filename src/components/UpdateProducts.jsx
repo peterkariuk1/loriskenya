@@ -5,6 +5,11 @@ import '../styles/update.css';
 import { FiSearch, FiEdit, FiCheck, FiX } from 'react-icons/fi';
 import { getStockQuantity, getStockLabel } from '../utils/inventory';
 import { buildProductVector, VECTOR_VERSION } from '../utils/productVector.js';
+import {
+  countDescriptionWords,
+  DESCRIPTION_WORD_LIMIT,
+  trimDescriptionToLimit,
+} from '../utils/description.js';
 
 function UpdateProducts({ onAddProduct }) {
   const [products, setProducts] = useState([]);
@@ -74,7 +79,8 @@ function UpdateProducts({ onAddProduct }) {
     setEditingProduct(product.id);
     setEditForm({
       price: product.price,
-      stockQuantity: getStockQuantity(product)
+      stockQuantity: getStockQuantity(product),
+      description: product.description || ""
     });
   };
 
@@ -89,15 +95,22 @@ function UpdateProducts({ onAddProduct }) {
     try {
       const productRef = doc(db, 'products', productId);
       const nextStock = Math.max(0, Number(editForm.stockQuantity) || 0);
+      const descriptionWordCount = countDescriptionWords(editForm.description);
+      if (descriptionWordCount > DESCRIPTION_WORD_LIMIT) {
+        alert(`Description must be ${DESCRIPTION_WORD_LIMIT} words or fewer before saving.`);
+        return;
+      }
       const updates = {
         price: parseFloat(editForm.price),
         inStock: nextStock > 0,
-        stockQuantity: nextStock
+        stockQuantity: nextStock,
+        description: editForm.description || ""
       };
       try {
         updates.vec = buildProductVector({
           ...products.find((product) => product.id === productId),
           price: updates.price,
+          description: updates.description,
         });
         updates.vecVersion = VECTOR_VERSION;
         updates.vecUpdatedAt = serverTimestamp();
@@ -113,7 +126,8 @@ function UpdateProducts({ onAddProduct }) {
             ...product,
             price: parseFloat(editForm.price),
             inStock: Math.max(0, Number(editForm.stockQuantity) || 0) > 0,
-            stockQuantity: Math.max(0, Number(editForm.stockQuantity) || 0)
+            stockQuantity: Math.max(0, Number(editForm.stockQuantity) || 0),
+            description: editForm.description || ""
           };
         }
         return product;
@@ -130,9 +144,12 @@ function UpdateProducts({ onAddProduct }) {
   // Handle form changes
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;
+    const nextValue = name === "description" && countDescriptionWords(value) > DESCRIPTION_WORD_LIMIT
+      ? trimDescriptionToLimit(value)
+      : value;
     setEditForm(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : nextValue
     }));
   };
 
@@ -218,6 +235,26 @@ function UpdateProducts({ onAddProduct }) {
                   <td className="update-product-name">
                     <div>{product.name}</div>
                     <span className="update-product-id">{product.id}</span>
+                    {editingProduct === product.id && (
+                      <>
+                        <textarea
+                          name="description"
+                          value={editForm.description}
+                          onChange={handleFormChange}
+                          rows="3"
+                          className="update-description-input"
+                          aria-label={`Description for ${product.name}`}
+                        />
+                        <span className={`update-description-count ${countDescriptionWords(editForm.description) > DESCRIPTION_WORD_LIMIT ? "warning" : ""}`}>
+                          {countDescriptionWords(editForm.description)}/{DESCRIPTION_WORD_LIMIT} words
+                        </span>
+                        {countDescriptionWords(editForm.description) > DESCRIPTION_WORD_LIMIT && (
+                          <span className="update-description-warning">
+                            Shorten this description before saving.
+                          </span>
+                        )}
+                      </>
+                    )}
                   </td>
                   <td>{product.category || 'Uncategorized'}</td>
                   <td>

@@ -2,18 +2,32 @@
 
 .header {
   position: sticky;
-  transition: .2s opacity 0.3s ease, .2s transform 0.3s ease;
+  top: 0;
+  transition: transform 280ms ease-out, opacity 280ms ease-out, box-shadow 180ms ease-out;
+  will-change: transform;
 }
 
-.header.hidden {
+.header[data-hidden="true"] {
   opacity: 0;
-  transform: translateY(-20px);
+  transform: translateY(-100%);
   pointer-events: none;
 }
 
-.header.visible {
+.header[data-hidden="false"] {
   opacity: 1;
   transform: translateY(0);
+}
+
+.header:focus-within {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header {
+    transition: opacity 100ms linear, box-shadow 100ms linear;
+  }
 }
 .loris-logo {
   width: 150px;

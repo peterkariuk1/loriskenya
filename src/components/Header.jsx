@@ -57,7 +57,7 @@ const Header = () => {
   const [index, setIndex] = useState(0);
   const [animate, setAnimate] = useState("bounce-in");
   const [inputValue, setInputValue] = useState("");
-  const [isVisible, setIsVisible] = useState(true);
+  const headerRef = useRef(null);
   const { cartItemCount } = useCart();
 
   const [suggestions, setSuggestions] = useState([]);
@@ -260,35 +260,65 @@ const Header = () => {
   }, [inputValue]);
 
   useEffect(() => {
-    let timeoutId = null;
-    let lastScrollY = window.scrollY;
+    const header = headerRef.current;
+    if (!header) return undefined;
 
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+    let animationFrame = null;
+    let stopTimeout = null;
+    let lastScrollY = Math.max(0, window.scrollY);
 
-      if (currentScrollY > lastScrollY) {
-        setIsVisible(false);
-
-        if (timeoutId) clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          setIsVisible(true);
-        }, 100);
-      } else {
-        setIsVisible(true);
-      }
-
-      lastScrollY = currentScrollY;
+    const keepHeaderVisible = () => {
+      const activeElement = document.activeElement;
+      return (
+        window.scrollY <= 2 ||
+        header.contains(activeElement) ||
+        Boolean(header.querySelector(".profile-dropdown")) ||
+        Boolean(sessionStorage.getItem("loris-storefront-scroll"))
+      );
     };
 
-    window.addEventListener("scroll", handleScroll);
+    const revealHeader = () => {
+      header.dataset.hidden = "false";
+    };
+
+    const handleScroll = () => {
+      if (animationFrame !== null) return;
+
+      animationFrame = window.requestAnimationFrame(() => {
+        animationFrame = null;
+        const currentScrollY = Math.max(0, window.scrollY);
+        header.dataset.scrolled = currentScrollY > 2 ? "true" : "false";
+        const delta = Math.abs(currentScrollY - lastScrollY);
+        if (delta < 3) return;
+
+        lastScrollY = currentScrollY;
+        if (stopTimeout !== null) window.clearTimeout(stopTimeout);
+
+        if (keepHeaderVisible()) {
+          revealHeader();
+          return;
+        }
+
+        header.dataset.hidden = "true";
+        stopTimeout = window.setTimeout(() => {
+          stopTimeout = null;
+          revealHeader();
+        }, 180);
+      });
+    };
+
+    header.dataset.hidden = "false";
+    header.dataset.scrolled = window.scrollY > 2 ? "true" : "false";
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
-      clearTimeout(timeoutId);
+      if (stopTimeout !== null) window.clearTimeout(stopTimeout);
+      if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
   return (
-    <nav className={`header ${isVisible ? "visible" : "hidden"}`}>
+    <nav ref={headerRef} className="header" aria-label="Main navigation">
       <Link to="/">
         <img className="loris-logo" src={logoImage} alt="Loris Logo" />
       </Link>

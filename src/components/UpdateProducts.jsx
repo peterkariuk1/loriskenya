@@ -9,6 +9,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  startAfter,
   updateDoc,
   where,
   writeBatch,
@@ -55,7 +56,8 @@ function UpdateProducts({ onAddProduct }) {
   const [movementError, setMovementError] = useState('');
   const [movementSaveError, setMovementSaveError] = useState('');
   const [movementSaving, setMovementSaving] = useState(false);
-  const [movementVisibleCount, setMovementVisibleCount] = useState(20);
+  const [movementCursor, setMovementCursor] = useState(null);
+  const [movementHasMore, setMovementHasMore] = useState(false);
 
   const filteredMovements = useMemo(() => movements.filter((movement) => (
     (movementFilter === 'all' || movement.type === movementFilter)
@@ -130,49 +132,65 @@ function UpdateProducts({ onAddProduct }) {
     setEditForm({});
   };
 
+  const loadMovements = async (product, cursor = null, replace = true) => {
+    setMovementLoading(true);
+    try {
+      const movementConstraints = [
+        where('productId', '==', product.id),
+        orderBy('createdAt', 'desc'),
+        ...(cursor ? [startAfter(cursor)] : []),
+        limit(50),
+      ];
+      const snapshot = await getDocs(query(collection(db, 'stock_movements'), ...movementConstraints));
+      const loadedMovements = snapshot.docs.map((movementDoc) => ({
+        id: movementDoc.id,
+        ...movementDoc.data(),
+      }));
+      setMovements((current) => replace ? loadedMovements : [...current, ...loadedMovements]);
+      setMovementCursor(snapshot.docs[snapshot.docs.length - 1] || null);
+      setMovementHasMore(snapshot.docs.length === 50);
+    } catch (error) {
+      if (error.code !== 'failed-precondition') {
+        setMovementError(`Unable to load stock history (${error.code || 'unknown-error'}).`);
+        return;
+      }
+      try {
+        const fallbackSnapshot = await getDocs(query(
+          collection(db, 'stock_movements'),
+          where('productId', '==', product.id),
+          limit(50)
+        ));
+        const fallbackMovements = fallbackSnapshot.docs.map((movementDoc) => ({
+          id: movementDoc.id,
+          ...movementDoc.data(),
+        }));
+        fallbackMovements.sort((left, right) => (
+          movementDate(right.createdAt).getTime() - movementDate(left.createdAt).getTime()
+        ));
+        setMovements(fallbackMovements);
+        setMovementCursor(null);
+        setMovementHasMore(false);
+        setMovementError(
+          `History loaded without server ordering (${error.code}). ` +
+          'Create a composite index on stock_movements: productId ASC, createdAt DESC.'
+        );
+      } catch (fallbackError) {
+        setMovementError(`Unable to load stock history (${fallbackError.code || 'unknown-error'}).`);
+      }
+    } finally {
+      setMovementLoading(false);
+    }
+  };
+
   const openStockModal = async (product) => {
     setSelectedProduct(product);
     setStockModalOpen(true);
     setStockForm({ type: 'Restock/Add', amount: '', note: '' });
     setMovementFilter('all');
     setMovementSearch('');
-    setMovementVisibleCount(20);
     setMovementError('');
     setMovementSaveError('');
-    setMovementLoading(true);
-    try {
-      let snapshot;
-      try {
-        snapshot = await getDocs(query(
-          collection(db, 'stock_movements'),
-          where('productId', '==', product.id),
-          orderBy('createdAt', 'desc'),
-          limit(50)
-        ));
-      } catch (orderedError) {
-        snapshot = await getDocs(query(
-          collection(db, 'stock_movements'),
-          where('productId', '==', product.id),
-          limit(50)
-        ));
-        setMovementError(
-          `History loaded without server ordering (${orderedError.code || 'index-required'}). ` +
-          'Create a composite index on stock_movements: productId ASC, createdAt DESC.'
-        );
-      }
-      const loadedMovements = snapshot.docs.map((movementDoc) => ({
-        id: movementDoc.id,
-        ...movementDoc.data(),
-      }));
-      loadedMovements.sort((left, right) => (
-        movementDate(right.createdAt)?.getTime() - movementDate(left.createdAt)?.getTime()
-      ));
-      setMovements(loadedMovements);
-    } catch (error) {
-      setMovementError(`Unable to load stock history (${error.code || 'unknown-error'}).`);
-    } finally {
-      setMovementLoading(false);
-    }
+    await loadMovements(product);
   };
 
   const closeStockModal = () => {
@@ -535,7 +553,7 @@ function UpdateProducts({ onAddProduct }) {
                 {movementError && <p className="update-stock-error" role="alert">{movementError}</p>}
                 {movementLoading ? <p>Loading history...</p> : filteredMovements.length === 0 ? <p>No stock movements recorded.</p> : (
                   <div className="inventory-movement-list">
-                    {filteredMovements.slice(0, movementVisibleCount).map((movement) => (
+                    {filteredMovements.map((movement) => (
                       <div className="inventory-movement" key={movement.id}>
                         <strong>{movement.change > 0 ? '+' : ''}{movement.change}</strong>
                         <div><strong>{movement.type}</strong><span>{movement.note || 'No note'}</span></div>
@@ -545,8 +563,8 @@ function UpdateProducts({ onAddProduct }) {
                     ))}
                   </div>
                 )}
-                {filteredMovements.length > movementVisibleCount && (
-                  <button type="button" className="admin-back-button" onClick={() => setMovementVisibleCount((count) => count + 20)}>Load more</button>
+                {movementHasMore && movementCursor && (
+                  <button type="button" className="admin-back-button" onClick={() => loadMovements(selectedProduct, movementCursor, false)}>Load more</button>
                 )}
               </div>
             </div>

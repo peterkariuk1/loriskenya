@@ -74,6 +74,7 @@ export const CartProvider = ({ children }) => {
         return [...prevCart, { ...product, quantity: Math.min(quantity, availableStock) }];
       }
     });
+    window.dispatchEvent(new CustomEvent("cart:item-added"));
     return true;
   };
   

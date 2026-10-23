@@ -53,6 +53,8 @@ const Header = () => {
   const searchInputRef = useRef(null);
   const suggestionsRef = useRef(null);
   const profileDropdownRef = useRef(null);
+  const cartIconRef = useRef(null);
+  const pendingCartShakeRef = useRef(false);
 
   const [index, setIndex] = useState(0);
   const [animate, setAnimate] = useState("bounce-in");
@@ -265,7 +267,18 @@ const Header = () => {
 
     let animationFrame = null;
     let stopTimeout = null;
+    let suppressionTimeout = null;
     let lastScrollY = Math.max(0, window.scrollY);
+    let suppressScrollHide = Boolean(sessionStorage.getItem("loris-storefront-scroll"));
+
+    const playCartShake = () => {
+      const icon = cartIconRef.current;
+      if (!icon || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      icon.classList.remove("cart-icon-shake");
+      void icon.offsetWidth;
+      icon.classList.add("cart-icon-shake");
+    };
 
     const keepHeaderVisible = () => {
       const activeElement = document.activeElement;
@@ -273,12 +286,18 @@ const Header = () => {
         window.scrollY <= 2 ||
         header.contains(activeElement) ||
         Boolean(header.querySelector(".profile-dropdown")) ||
-        Boolean(sessionStorage.getItem("loris-storefront-scroll"))
+        Boolean(header.querySelector('[data-mobile-menu-open="true"], [data-cart-drawer-open="true"]')) ||
+        Boolean(document.querySelector('[aria-modal="true"]')) ||
+        suppressScrollHide
       );
     };
 
     const revealHeader = () => {
       header.dataset.hidden = "false";
+      if (pendingCartShakeRef.current) {
+        pendingCartShakeRef.current = false;
+        playCartShake();
+      }
     };
 
     const handleScroll = () => {
@@ -286,20 +305,24 @@ const Header = () => {
 
       animationFrame = window.requestAnimationFrame(() => {
         animationFrame = null;
+        if (suppressScrollHide && !sessionStorage.getItem("loris-storefront-scroll")) {
+          suppressScrollHide = false;
+          if (suppressionTimeout !== null) window.clearTimeout(suppressionTimeout);
+          suppressionTimeout = null;
+        }
         const currentScrollY = Math.max(0, window.scrollY);
         header.dataset.scrolled = currentScrollY > 2 ? "true" : "false";
         const delta = Math.abs(currentScrollY - lastScrollY);
-        if (delta < 3) return;
+        if (delta >= 3) lastScrollY = currentScrollY;
 
-        lastScrollY = currentScrollY;
         if (stopTimeout !== null) window.clearTimeout(stopTimeout);
 
         if (keepHeaderVisible()) {
           revealHeader();
-          return;
+        } else {
+          header.dataset.hidden = "true";
         }
 
-        header.dataset.hidden = "true";
         stopTimeout = window.setTimeout(() => {
           stopTimeout = null;
           revealHeader();
@@ -307,13 +330,53 @@ const Header = () => {
       });
     };
 
+    const handleScrollEnd = () => {
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = null;
+      }
+      if (stopTimeout !== null) window.clearTimeout(stopTimeout);
+      stopTimeout = null;
+      revealHeader();
+    };
+
+    const handleCartItemAdded = () => {
+      if (header.dataset.hidden === "true") {
+        pendingCartShakeRef.current = true;
+        return;
+      }
+      playCartShake();
+    };
+
+    if (suppressScrollHide) {
+      suppressionTimeout = window.setTimeout(() => {
+        suppressScrollHide = false;
+        suppressionTimeout = null;
+      }, 2500);
+    }
+
     header.dataset.hidden = "false";
     header.dataset.scrolled = window.scrollY > 2 ? "true" : "false";
     window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scrollend", handleScrollEnd, { passive: true });
+    window.addEventListener("cart:item-added", handleCartItemAdded);
+
+    const handleAnimationEnd = (event) => {
+      if (event.animationName === "cart-icon-shake") {
+        event.currentTarget.classList.remove("cart-icon-shake");
+      }
+    };
+    const cartIcon = cartIconRef.current;
+    cartIcon?.addEventListener("animationend", handleAnimationEnd);
+
     return () => {
       if (stopTimeout !== null) window.clearTimeout(stopTimeout);
+      if (suppressionTimeout !== null) window.clearTimeout(suppressionTimeout);
       if (animationFrame !== null) window.cancelAnimationFrame(animationFrame);
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scrollend", handleScrollEnd);
+      window.removeEventListener("cart:item-added", handleCartItemAdded);
+      cartIcon?.removeEventListener("animationend", handleAnimationEnd);
     };
   }, []);
 
@@ -443,7 +506,7 @@ const Header = () => {
         
         <Link to="/checkout" aria-label={`Shopping cart, ${cartItemCount} items`}>
           <div className="cart-container">
-            <img src={cartIcon} alt="" />
+            <img ref={cartIconRef} src={cartIcon} alt="" />
             {cartItemCount > 0 && (
               <div className="cart-counter-container">
                 <p>{cartItemCount > 999 ? "999+" : cartItemCount}</p>

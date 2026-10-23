@@ -206,6 +206,22 @@
   object-fit: contain;
 }
 
+.header .cart-container img.cart-icon-shake {
+  transform-origin: 50% 12%;
+  animation: cart-icon-shake 500ms ease-in-out both;
+}
+
+@keyframes cart-icon-shake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  12% { transform: translateX(-1px) rotate(-8deg); }
+  24% { transform: translateX(1px) rotate(7deg); }
+  36% { transform: translateX(-1px) rotate(-6deg); }
+  48% { transform: translateX(1px) rotate(5deg); }
+  60% { transform: translateX(-1px) rotate(-3.5deg); }
+  72% { transform: translateX(1px) rotate(2.5deg); }
+  84% { transform: translateX(0) rotate(-1deg); }
+}
+
 .header .right > a {
   display: inline-flex;
   color: inherit;

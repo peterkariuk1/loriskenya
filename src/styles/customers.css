@@ -408,6 +408,39 @@
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
 
+.customers-table tbody tr {
+  cursor: pointer;
+}
+
+.customer-edit-form {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.customer-edit-form h4 {
+  margin: 0 0 6px;
+}
+
+.customer-edit-form input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 9px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+  font: inherit;
+}
+
+.customer-edit-form label {
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.customer-edit-form .save-client-btn {
+  justify-self: start;
+  margin-top: 8px;
+}
+
 .modal-close {
   margin-left: auto;
   padding: 6px;

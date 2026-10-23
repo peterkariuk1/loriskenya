@@ -7,6 +7,7 @@ import {
   serverTimestamp,
   setDoc,
   doc,
+  updateDoc,
   where
 } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
@@ -95,6 +96,9 @@ function Customers() {
   const [startValue, setStartValue] = useState('');
   const [endValue, setEndValue] = useState('');
   const [clientForm, setClientForm] = useState({ whatsappNumber: '', firstName: '', secondName: '' });
+  const [editCustomerForm, setEditCustomerForm] = useState({});
+  const [editCustomerSaving, setEditCustomerSaving] = useState(false);
+  const [editCustomerMessage, setEditCustomerMessage] = useState(null);
 
   const dateRange = useMemo(
     () => getDateRange(period, monthValue, dayValue, yearValue, startValue, endValue),
@@ -238,6 +242,67 @@ function Customers() {
     setSelectedCustomer(null);
     setFormMessage(null);
     setClientForm({ whatsappNumber: '', firstName: '', secondName: '' });
+    setEditCustomerForm({});
+    setEditCustomerMessage(null);
+  };
+
+  const openCustomerDetails = (customer) => {
+    setSelectedCustomer(customer);
+    setEditCustomerForm({
+      firstName: customer.firstName || '',
+      secondName: customer.secondName || '',
+      lastName: customer.lastName || '',
+      whatsappNumber: customer.whatsappNumber || customer.phone || ''
+    });
+    setEditCustomerMessage(null);
+    setShowDetails(true);
+  };
+
+  const handleCustomerEdit = async (event) => {
+    event.preventDefault();
+    if (!selectedCustomer) return;
+    const normalizedPhone = normalizeKenyanPhone(editCustomerForm.whatsappNumber, { allowInternational: false });
+    if (!normalizedPhone) {
+      setEditCustomerMessage({ type: 'error', text: 'Enter a valid Kenyan WhatsApp number, for example 0712345678.' });
+      return;
+    }
+
+    const updates = {};
+    ['firstName', 'secondName', 'lastName'].forEach((field) => {
+      const nextValue = (editCustomerForm[field] || '').trim();
+      if (nextValue !== (selectedCustomer[field] || '')) updates[field] = nextValue;
+    });
+    const currentPhone = normalizeKenyanPhone(selectedCustomer.whatsappNumber || selectedCustomer.phone || '');
+    if (normalizedPhone !== currentPhone) {
+      updates.whatsappNumber = normalizedPhone;
+      updates.phone = normalizedPhone;
+    }
+    if (!Object.keys(updates).length) {
+      setEditCustomerMessage({ type: 'success', text: 'No changes to save.' });
+      return;
+    }
+
+    try {
+      setEditCustomerSaving(true);
+      await updateDoc(doc(db, 'users', selectedCustomer.id), updates);
+      const updatedCustomer = { ...selectedCustomer, ...updates, whatsappNumber: normalizedPhone };
+      setSelectedCustomer(updatedCustomer);
+      setCustomers((current) => current.map((customer) => (
+        customer.id === updatedCustomer.id ? updatedCustomer : customer
+      )));
+      setEditCustomerForm({
+        firstName: updatedCustomer.firstName || '',
+        secondName: updatedCustomer.secondName || '',
+        lastName: updatedCustomer.lastName || '',
+        whatsappNumber: updatedCustomer.whatsappNumber || updatedCustomer.phone || ''
+      });
+      setEditCustomerMessage({ type: 'success', text: 'Customer details saved.' });
+    } catch (saveError) {
+      console.error('Error updating customer:', saveError);
+      setEditCustomerMessage({ type: 'error', text: `Customer could not be saved (${saveError.code || 'unknown-error'}).` });
+    } finally {
+      setEditCustomerSaving(false);
+    }
   };
 
   const handleCreateClient = async (event) => {
@@ -414,14 +479,14 @@ function Customers() {
               <th>Actions</th>
             </tr></thead>
             <tbody>{filteredCustomers.map((customer) => (
-              <tr key={customer.id}>
+              <tr key={customer.id} onClick={() => openCustomerDetails(customer)}>
                 <td className="customer-name-cell"><div className="customer-avatar">{(customer.firstName || '?').charAt(0).toUpperCase()}</div><div><div className="customer-name">{customerName(customer)}</div><div className="customer-id">{customer.id}</div></div></td>
                 <td><div className="contact-info"><FiPhone /> {customer.whatsappNumber || customer.phone || 'Not provided'}</div></td>
                 <td>{customer.periodOrders.length} <span className="period-hint">({customer.orderCount} all time)</span></td>
                 <td>{formatCurrency(dateRange ? customer.periodRevenue : customer.lifetimeValue)}{dateRange && <div className="period-hint">in selected period</div>}</td>
                 <td>{customer.loyaltyPoints.toLocaleString('en-KE')}</td>
                 <td>{formatDate(customer.joinDate)}</td>
-                <td><button className="view-details-btn" onClick={() => { setSelectedCustomer(customer); setShowDetails(true); }}><FiEye /> Details</button></td>
+                <td><button className="view-details-btn" onClick={(event) => { event.stopPropagation(); openCustomerDetails(customer); }}><FiEye /> Details</button></td>
               </tr>
             ))}</tbody>
           </table>
@@ -433,6 +498,18 @@ function Customers() {
           <div className="customer-modal" onClick={(event) => event.stopPropagation()}>
             <div className="modal-header"><div className="customer-modal-avatar">{(selectedCustomer.firstName || '?').charAt(0).toUpperCase()}</div><div><h3>{customerName(selectedCustomer)}</h3><p className="customer-since">Client since {formatDate(selectedCustomer.joinDate)}</p></div><button className="modal-close" onClick={closeOverlays} aria-label="Close details"><FiX /></button></div>
             <div className="modal-body">
+              <form className="customer-edit-form" onSubmit={handleCustomerEdit}>
+                <h4>Edit customer</h4>
+                <label htmlFor="edit-customer-first-name">First name</label>
+                <input id="edit-customer-first-name" value={editCustomerForm.firstName || ''} onChange={(event) => setEditCustomerForm({ ...editCustomerForm, firstName: event.target.value })} />
+                <label htmlFor="edit-customer-second-name">Second name</label>
+                <input id="edit-customer-second-name" value={editCustomerForm.secondName || ''} onChange={(event) => setEditCustomerForm({ ...editCustomerForm, secondName: event.target.value })} />
+                {selectedCustomer.lastName && <><label htmlFor="edit-customer-last-name">Last name</label><input id="edit-customer-last-name" value={editCustomerForm.lastName || ''} onChange={(event) => setEditCustomerForm({ ...editCustomerForm, lastName: event.target.value })} /></>}
+                <label htmlFor="edit-customer-phone">WhatsApp / phone</label>
+                <input id="edit-customer-phone" inputMode="numeric" maxLength={10} value={editCustomerForm.whatsappNumber || ''} onChange={(event) => setEditCustomerForm({ ...editCustomerForm, whatsappNumber: event.target.value })} />
+                {editCustomerMessage && <div className={`form-message ${editCustomerMessage.type}`} role="alert">{editCustomerMessage.text}</div>}
+                <button type="submit" className="save-client-btn" disabled={editCustomerSaving}>{editCustomerSaving ? 'Saving...' : 'Save changes'}</button>
+              </form>
               <div className="detail-section"><h4>Client Information</h4><div className="detail-row"><div className="detail-label"><FiPhone /> WhatsApp</div><div className="detail-value">{selectedCustomer.whatsappNumber || selectedCustomer.phone || 'Not provided'}</div></div><div className="detail-row"><div className="detail-label">Lifetime Spend</div><div className="detail-value">{formatCurrency(selectedCustomer.lifetimeValue)}</div></div><div className="detail-row"><div className="detail-label">Loyalty Points</div><div className="detail-value">{selectedCustomer.loyaltyPoints.toLocaleString('en-KE')}</div></div></div>
               <div className="detail-section"><h4>Purchase History</h4>{selectedCustomer.orders.length === 0 ? <p className="history-empty">No purchases recorded for this client.</p> : <div className="purchase-history">{selectedCustomer.orders.map((order) => <div className="purchase-row" key={order.id}><div><strong>{order.id}</strong><span>{formatDate(order.date)}</span></div><strong>{formatCurrency(order.total)}</strong></div>)}</div>}</div>
             </div>

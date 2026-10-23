@@ -442,3 +442,106 @@
   color: #76685e;
   font-size: 0.85rem;
 }
+
+.update-products-table tbody tr {
+  cursor: pointer;
+}
+
+.stock-trace-modal {
+  width: min(900px, 94vw);
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--color-surface-primary);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.update-modal-header {
+  position: relative;
+}
+
+.update-modal-header img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.update-modal-close {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  font-size: 1.7rem;
+  cursor: pointer;
+}
+
+.stock-adjustment-form {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+
+.stock-adjustment-form h4 {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.stock-adjustment-form label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.85rem;
+}
+
+.stock-adjustment-form input,
+.stock-adjustment-form select,
+.stock-history-filters input,
+.stock-history-filters select {
+  min-height: 38px;
+  box-sizing: border-box;
+  padding: 7px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+  background: #fff;
+}
+
+.stock-adjustment-form button {
+  min-height: 38px;
+  margin: 0;
+}
+
+.stock-history-heading,
+.stock-history-filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.stock-history-heading h4 {
+  margin: 0 0 10px;
+}
+
+.stock-history-filters {
+  justify-content: flex-start;
+  margin-bottom: 12px;
+}
+
+.stock-history-filters input {
+  flex: 1;
+}
+
+.update-stock-error {
+  color: #c62828;
+}
+
+@media (max-width: 700px) {
+  .stock-adjustment-form {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory-movement {
+    grid-template-columns: auto 1fr;
+  }
+}

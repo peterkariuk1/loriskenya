@@ -1,6 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { db } from '../../firebase/firebaseConfig';
-import { collection, getDocs, doc, query, orderBy, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { auth } from '../../firebase/firebaseConfig';
+import {
+  collection,
+  getDocs,
+  doc,
+  limit,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
+  writeBatch,
+} from 'firebase/firestore';
 import '../styles/update.css';
 import { FiSearch, FiEdit, FiCheck, FiX } from 'react-icons/fi';
 import { getStockQuantity, getStockLabel } from '../utils/inventory';
@@ -10,6 +22,18 @@ import {
   DESCRIPTION_WORD_LIMIT,
   trimDescriptionToLimit,
 } from '../utils/description.js';
+
+const movementDate = (value) => {
+  if (!value) return new Date(0);
+  if (typeof value.toDate === 'function') return value.toDate();
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? new Date(0) : date;
+};
+
+const formatMovementDate = (value) => {
+  const date = movementDate(value);
+  return date.getTime() ? date.toLocaleString('en-KE') : 'Pending';
+};
 
 function UpdateProducts({ onAddProduct }) {
   const [products, setProducts] = useState([]);
@@ -21,6 +45,22 @@ function UpdateProducts({ onAddProduct }) {
   const [editForm, setEditForm] = useState({});
   const [activeCategory, setActiveCategory] = useState('all');
   const [categories, setCategories] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [stockModalOpen, setStockModalOpen] = useState(false);
+  const [stockForm, setStockForm] = useState({ type: 'Restock/Add', amount: '', note: '' });
+  const [movements, setMovements] = useState([]);
+  const [movementFilter, setMovementFilter] = useState('all');
+  const [movementSearch, setMovementSearch] = useState('');
+  const [movementLoading, setMovementLoading] = useState(false);
+  const [movementError, setMovementError] = useState('');
+  const [movementSaveError, setMovementSaveError] = useState('');
+  const [movementSaving, setMovementSaving] = useState(false);
+  const [movementVisibleCount, setMovementVisibleCount] = useState(20);
+
+  const filteredMovements = useMemo(() => movements.filter((movement) => (
+    (movementFilter === 'all' || movement.type === movementFilter)
+    && (!movementSearch.trim() || String(movement.note || '').toLowerCase().includes(movementSearch.trim().toLowerCase()))
+  )), [movements, movementFilter, movementSearch]);
 
   // Fetch products on component mount
   useEffect(() => {
@@ -88,6 +128,121 @@ function UpdateProducts({ onAddProduct }) {
   const handleCancelEdit = () => {
     setEditingProduct(null);
     setEditForm({});
+  };
+
+  const openStockModal = async (product) => {
+    setSelectedProduct(product);
+    setStockModalOpen(true);
+    setStockForm({ type: 'Restock/Add', amount: '', note: '' });
+    setMovementFilter('all');
+    setMovementSearch('');
+    setMovementVisibleCount(20);
+    setMovementError('');
+    setMovementSaveError('');
+    setMovementLoading(true);
+    try {
+      let snapshot;
+      try {
+        snapshot = await getDocs(query(
+          collection(db, 'stock_movements'),
+          where('productId', '==', product.id),
+          orderBy('createdAt', 'desc'),
+          limit(50)
+        ));
+      } catch (orderedError) {
+        snapshot = await getDocs(query(
+          collection(db, 'stock_movements'),
+          where('productId', '==', product.id),
+          limit(50)
+        ));
+        setMovementError(
+          `History loaded without server ordering (${orderedError.code || 'index-required'}). ` +
+          'Create a composite index on stock_movements: productId ASC, createdAt DESC.'
+        );
+      }
+      const loadedMovements = snapshot.docs.map((movementDoc) => ({
+        id: movementDoc.id,
+        ...movementDoc.data(),
+      }));
+      loadedMovements.sort((left, right) => (
+        movementDate(right.createdAt)?.getTime() - movementDate(left.createdAt)?.getTime()
+      ));
+      setMovements(loadedMovements);
+    } catch (error) {
+      setMovementError(`Unable to load stock history (${error.code || 'unknown-error'}).`);
+    } finally {
+      setMovementLoading(false);
+    }
+  };
+
+  const closeStockModal = () => {
+    if (movementSaving) return;
+    setStockModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleStockAdjustment = async (event) => {
+    event.preventDefault();
+    const amount = Number(stockForm.amount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setMovementSaveError('Enter an amount greater than zero.');
+      return;
+    }
+    if (!selectedProduct) return;
+
+    const previousQty = getStockQuantity(selectedProduct);
+    const change = stockForm.type === 'Restock/Add' ? amount : -amount;
+    const newQty = Math.max(0, previousQty + change);
+    if (stockForm.type === 'Remove/Correction' && amount > previousQty) {
+      setMovementSaveError('The removal cannot exceed the current quantity.');
+      return;
+    }
+
+    setMovementSaving(true);
+    setMovementSaveError('');
+    try {
+      const batch = writeBatch(db);
+      batch.update(doc(db, 'products', selectedProduct.id), {
+        stockQuantity: newQty,
+        inStock: newQty > 0,
+      });
+      const movementRef = doc(collection(db, 'stock_movements'));
+      batch.set(movementRef, {
+        productId: selectedProduct.id,
+        productName: selectedProduct.name || '',
+        change,
+        previousQty,
+        newQty,
+        type: stockForm.type,
+        note: stockForm.note.trim(),
+        createdBy: auth.currentUser?.uid || null,
+        createdAt: serverTimestamp(),
+      });
+      await batch.commit();
+
+      const updatedProduct = { ...selectedProduct, stockQuantity: newQty, inStock: newQty > 0 };
+      setSelectedProduct(updatedProduct);
+      setProducts((current) => current.map((product) => (
+        product.id === updatedProduct.id ? updatedProduct : product
+      )));
+      setMovements((current) => [{
+        id: movementRef.id,
+        productId: updatedProduct.id,
+        productName: updatedProduct.name || '',
+        change,
+        previousQty,
+        newQty,
+        type: stockForm.type,
+        note: stockForm.note.trim(),
+        createdBy: auth.currentUser?.uid || null,
+        createdAt: new Date(),
+      }, ...current]);
+      setStockForm({ type: 'Restock/Add', amount: '', note: '' });
+    } catch (error) {
+      setMovementSaveError(`Stock update failed (${error.code || 'unknown-error'}). No changes were saved.`);
+    } finally {
+      setMovementSaving(false);
+    }
   };
 
   // Save product changes
@@ -224,7 +379,11 @@ function UpdateProducts({ onAddProduct }) {
             </thead>
             <tbody>
               {filteredProducts.map(product => (
-                <tr key={product.id} className={editingProduct === product.id ? 'editing' : ''}>
+                <tr
+                  key={product.id}
+                  className={editingProduct === product.id ? 'editing' : ''}
+                  onClick={() => openStockModal(product)}
+                >
                   <td className="update-product-image">
                     {product.image ? (
                       <img src={product.image} alt={product.name} />
@@ -257,7 +416,7 @@ function UpdateProducts({ onAddProduct }) {
                     )}
                   </td>
                   <td>{product.category || 'Uncategorized'}</td>
-                  <td>
+                  <td onClick={(event) => event.stopPropagation()}>
                     {editingProduct === product.id ? (
                       <input
                         type="number"
@@ -270,7 +429,7 @@ function UpdateProducts({ onAddProduct }) {
                       `KSh ${parseFloat(product.price).toLocaleString()}`
                     )}
                   </td>
-                  <td>
+                  <td onClick={(event) => event.stopPropagation()}>
                     {editingProduct === product.id ? (
                       <span className={`update-status-badge ${getStockQuantity(product) > 0 ? 'in-stock' : 'out-stock'}`}>
                         {getStockLabel({ ...product, stockQuantity: editForm.stockQuantity })}
@@ -295,7 +454,7 @@ function UpdateProducts({ onAddProduct }) {
                       `${Number(product.stockQuantity) || 0} units`
                     )}
                   </td>
-                  <td className="update-actions-cell">
+                  <td className="update-actions-cell" onClick={(event) => event.stopPropagation()}>
                     {editingProduct === product.id ? (
                       <>
                         <button
@@ -326,6 +485,72 @@ function UpdateProducts({ onAddProduct }) {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {stockModalOpen && selectedProduct && (
+        <div className="update-modal-backdrop" onClick={closeStockModal}>
+          <div className="stock-trace-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="update-modal-header">
+              {selectedProduct.image && <img src={selectedProduct.image} alt="" />}
+              <div>
+                <h3>{selectedProduct.name}</h3>
+                <p>{selectedProduct.category || 'Uncategorized'} · KSh {Number(selectedProduct.price || 0).toLocaleString()}</p>
+                <strong>{getStockQuantity(selectedProduct)} units · {getStockLabel(selectedProduct)}</strong>
+              </div>
+              <button type="button" className="update-modal-close" onClick={closeStockModal} aria-label="Close stock details">×</button>
+            </div>
+            <div className="update-modal-content">
+              <form className="stock-adjustment-form" onSubmit={handleStockAdjustment}>
+                <h4>Adjust quantity</h4>
+                <label>Type
+                  <select value={stockForm.type} onChange={(event) => setStockForm({ ...stockForm, type: event.target.value })}>
+                    <option>Restock/Add</option>
+                    <option>Remove/Correction</option>
+                  </select>
+                </label>
+                <label>Amount
+                  <input type="number" min="1" step="1" value={stockForm.amount} onChange={(event) => setStockForm({ ...stockForm, amount: event.target.value })} required />
+                </label>
+                <label>Note (optional)
+                  <input type="text" value={stockForm.note} onChange={(event) => setStockForm({ ...stockForm, note: event.target.value })} />
+                </label>
+                {movementSaveError && <p className="update-stock-error" role="alert">{movementSaveError}</p>}
+                <button type="submit" className="update-action-btn update-save-btn" disabled={movementSaving}>
+                  {movementSaving ? 'Saving...' : 'Save adjustment'}
+                </button>
+              </form>
+
+              <div className="stock-history">
+                <div className="stock-history-heading"><h4>Stock history</h4><span>Latest 50</span></div>
+                <div className="stock-history-filters">
+                  <select value={movementFilter} onChange={(event) => setMovementFilter(event.target.value)}>
+                    <option value="all">All types</option>
+                    <option value="Restock/Add">Restock/Add</option>
+                    <option value="Remove/Correction">Remove/Correction</option>
+                    <option value="sale">Sale</option>
+                  </select>
+                  <input type="search" placeholder="Search notes" value={movementSearch} onChange={(event) => setMovementSearch(event.target.value)} />
+                </div>
+                {movementError && <p className="update-stock-error" role="alert">{movementError}</p>}
+                {movementLoading ? <p>Loading history...</p> : filteredMovements.length === 0 ? <p>No stock movements recorded.</p> : (
+                  <div className="inventory-movement-list">
+                    {filteredMovements.slice(0, movementVisibleCount).map((movement) => (
+                      <div className="inventory-movement" key={movement.id}>
+                        <strong>{movement.change > 0 ? '+' : ''}{movement.change}</strong>
+                        <div><strong>{movement.type}</strong><span>{movement.note || 'No note'}</span></div>
+                        <span>{formatMovementDate(movement.createdAt)}</span>
+                        <span>{movement.previousQty} → {movement.newQty}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {filteredMovements.length > movementVisibleCount && (
+                  <button type="button" className="admin-back-button" onClick={() => setMovementVisibleCount((count) => count + 20)}>Load more</button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

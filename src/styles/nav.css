@@ -5,6 +5,7 @@
   --header-gold: var(--palette-gold, #ffcb74);
   --header-surface: var(--palette-white, #ffffff);
   --header-muted: #6f6b66;
+  --header-background: var(--palette-near-black);
 
   position: sticky;
   top: 0;
@@ -18,16 +19,17 @@
   min-height: 76px;
   padding: 8px clamp(16px, 4vw, 64px);
   padding-top: calc(8px + env(safe-area-inset-top, 0px));
-  background: var(--header-surface);
-  border-bottom: 1px solid rgba(17, 17, 17, 0.08);
-  box-shadow: 0 2px 12px rgba(17, 17, 17, 0.035);
+  background: var(--header-background);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.035);
   transition: transform 280ms ease-out, opacity 280ms ease-out,
     box-shadow 180ms ease-out;
   will-change: transform;
 }
 
 .header[data-scrolled="true"] {
-  box-shadow: 0 5px 20px rgba(17, 17, 17, 0.1);
+  border-bottom-color: rgba(255, 203, 116, 0.28);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
 
 .header[data-hidden="true"] {
@@ -76,7 +78,7 @@
 
 .header .searchbox:focus-within {
   border-color: var(--header-gold);
-  box-shadow: 0 0 0 3px rgba(255, 203, 116, 0.28);
+  box-shadow: 0 0 0 3px var(--color-text-on-dark, #ffffff);
 }
 
 .header .search-input {
@@ -142,21 +144,21 @@
   padding: 0;
   border: 0;
   border-radius: 0 7px 7px 0;
-  background: var(--header-ink);
+  background: var(--header-gold);
   cursor: pointer;
-  transition: background-color 160ms ease;
+  transition: filter 160ms ease;
 }
 
 .header .search-button-container:hover,
 .header .search-button-container:active {
-  background: #33302b;
+  filter: brightness(0.96);
 }
 
 .header .search-button-container img {
   width: 18px;
   height: 18px;
   object-fit: contain;
-  filter: brightness(0) invert(1);
+  filter: none;
 }
 
 .header .right {
@@ -204,6 +206,14 @@
   width: 23px;
   height: 23px;
   object-fit: contain;
+  filter: brightness(0) invert(1);
+  transition: filter 160ms ease;
+}
+
+.header .profile-icon-wrapper:hover img,
+.header .cart-container:hover img {
+  filter: brightness(0) saturate(100%) invert(83%) sepia(34%) saturate(747%)
+    hue-rotate(336deg) brightness(104%) contrast(102%);
 }
 
 .header .cart-container img.cart-icon-shake {
@@ -239,7 +249,7 @@
   justify-content: center;
   box-sizing: border-box;
   padding: 0 4px;
-  border: 2px solid var(--header-surface);
+  border: 2px solid var(--header-background);
   border-radius: 999px;
   background: var(--header-gold);
   color: var(--header-ink);
@@ -259,7 +269,7 @@
   bottom: 7px;
   width: 8px;
   height: 8px;
-  border: 2px solid var(--header-surface);
+  border: 2px solid var(--header-background);
   border-radius: 50%;
   background: #24834a;
 }

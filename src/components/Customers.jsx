@@ -11,7 +11,8 @@ import {
   where
 } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
-import { isValidLocalKenyanPhone, normalizeKenyanPhone } from '../utils/phone';
+import { normalizeKenyanPhone } from '../utils/phone';
+import { normalizeCustomerPhone, validateCustomerPhoneInput } from '../utils/customerPhone.js';
 import {
   FiArrowDown,
   FiArrowUp,
@@ -254,14 +255,22 @@ function Customers() {
       lastName: customer.lastName || '',
       whatsappNumber: customer.whatsappNumber || customer.phone || ''
     });
-    setEditCustomerMessage(null);
+    const phoneValidation = validateCustomerPhoneInput(customer.whatsappNumber || customer.phone || '', { requireComplete: true });
+    setEditCustomerMessage(phoneValidation.valid
+      ? null
+      : { type: 'error', text: phoneValidation.message });
     setShowDetails(true);
   };
 
   const handleCustomerEdit = async (event) => {
     event.preventDefault();
     if (!selectedCustomer) return;
-    const normalizedPhone = normalizeKenyanPhone(editCustomerForm.whatsappNumber, { allowInternational: false });
+    const phoneValidation = validateCustomerPhoneInput(editCustomerForm.whatsappNumber, { requireComplete: true });
+    if (!phoneValidation.valid) {
+      setEditCustomerMessage({ type: 'error', text: phoneValidation.message });
+      return;
+    }
+    const normalizedPhone = normalizeCustomerPhone(editCustomerForm.whatsappNumber);
     if (!normalizedPhone) {
       setEditCustomerMessage({ type: 'error', text: 'Enter a valid Kenyan WhatsApp number, for example 0712345678.' });
       return;
@@ -274,6 +283,31 @@ function Customers() {
     });
     const currentPhone = normalizeKenyanPhone(selectedCustomer.whatsappNumber || selectedCustomer.phone || '');
     if (normalizedPhone !== currentPhone) {
+      const duplicateCustomer = customers.find((customer) => (
+        customer.id !== selectedCustomer.id
+        && normalizeCustomerPhone(customer.whatsappNumber || customer.phone || '') === normalizedPhone
+      ));
+      if (duplicateCustomer) {
+        setEditCustomerMessage({
+          type: 'duplicate',
+          text: `A client with this number already exists: ${duplicateCustomer.firstName || 'Unnamed client'}.`
+        });
+        return;
+      }
+      try {
+        const existingSnapshot = await getDocs(query(
+          collection(db, 'users'),
+          where('whatsappNumber', '==', normalizedPhone)
+        ));
+        if (existingSnapshot.docs.some((customerDoc) => customerDoc.id !== selectedCustomer.id)) {
+          setEditCustomerMessage({ type: 'duplicate', text: 'A client with this WhatsApp number already exists.' });
+          return;
+        }
+      } catch (lookupError) {
+        console.error('Error checking customer phone:', lookupError);
+        setEditCustomerMessage({ type: 'error', text: `Could not verify this phone number (${lookupError.code || 'unknown-error'}).` });
+        return;
+      }
       updates.whatsappNumber = normalizedPhone;
       updates.phone = normalizedPhone;
     }
@@ -308,7 +342,7 @@ function Customers() {
   const handleCreateClient = async (event) => {
     event.preventDefault();
     setFormMessage(null);
-    const normalizedPhone = normalizeKenyanPhone(clientForm.whatsappNumber.trim(), { allowInternational: false });
+    const normalizedPhone = normalizeCustomerPhone(clientForm.whatsappNumber.trim());
     if (!normalizedPhone) {
       setFormMessage({ type: 'error', text: 'Enter a valid Kenyan WhatsApp number, for example 0712345678.' });
       return;
@@ -365,24 +399,32 @@ function Customers() {
 
   const handleClientPhoneChange = (event) => {
     const nextValue = event.target.value;
-    if (!/^\d*$/.test(nextValue) || nextValue.length > 10) {
-      setFormMessage({ type: 'error', text: 'Use only digits, up to 10 characters, starting with 07 or 01.' });
-      return;
-    }
-    if (nextValue && nextValue[0] !== '0') {
-      setFormMessage({ type: 'error', text: 'Kenyan numbers must start with 07 or 01.' });
-      return;
-    }
-    if (nextValue.length > 1 && !['1', '7'].includes(nextValue[1])) {
-      setFormMessage({ type: 'error', text: 'Kenyan numbers must start with 07 or 01.' });
+    const validation = validateCustomerPhoneInput(nextValue);
+    if (!validation.valid && (
+      !/^\d*$/.test(nextValue) || nextValue.length > 10
+      || nextValue[0] !== '0'
+      || (nextValue.length > 1 && !['1', '7'].includes(nextValue[1]))
+    )) {
+      setFormMessage({ type: 'error', text: validation.message });
       return;
     }
     setClientForm({ ...clientForm, whatsappNumber: nextValue });
-    if (nextValue && nextValue.length === 10 && !isValidLocalKenyanPhone(nextValue)) {
-      setFormMessage({ type: 'error', text: 'The number must be 10 digits and start with 07 or 01.' });
-    } else {
-      setFormMessage(null);
+    setFormMessage(validation.valid ? null : { type: 'error', text: validation.message });
+  };
+
+  const handleEditCustomerPhoneChange = (event) => {
+    const nextValue = event.target.value;
+    const validation = validateCustomerPhoneInput(nextValue);
+    if (!validation.valid && (
+      !/^\d*$/.test(nextValue) || nextValue.length > 10
+      || nextValue[0] !== '0'
+      || (nextValue.length > 1 && !['1', '7'].includes(nextValue[1]))
+    )) {
+      setEditCustomerMessage({ type: 'error', text: validation.message });
+      return;
     }
+    setEditCustomerForm({ ...editCustomerForm, whatsappNumber: nextValue });
+    setEditCustomerMessage(validation.valid ? null : { type: 'error', text: validation.message });
   };
 
   const formatCurrency = (value) => `KSh ${Math.round(value || 0).toLocaleString('en-KE')}`;
@@ -506,7 +548,7 @@ function Customers() {
                 <input id="edit-customer-second-name" value={editCustomerForm.secondName || ''} onChange={(event) => setEditCustomerForm({ ...editCustomerForm, secondName: event.target.value })} />
                 {selectedCustomer.lastName && <><label htmlFor="edit-customer-last-name">Last name</label><input id="edit-customer-last-name" value={editCustomerForm.lastName || ''} onChange={(event) => setEditCustomerForm({ ...editCustomerForm, lastName: event.target.value })} /></>}
                 <label htmlFor="edit-customer-phone">WhatsApp / phone</label>
-                <input id="edit-customer-phone" inputMode="numeric" maxLength={10} value={editCustomerForm.whatsappNumber || ''} onChange={(event) => setEditCustomerForm({ ...editCustomerForm, whatsappNumber: event.target.value })} />
+                <input id="edit-customer-phone" inputMode="numeric" maxLength={10} value={editCustomerForm.whatsappNumber || ''} onChange={handleEditCustomerPhoneChange} onBlur={() => { const validation = validateCustomerPhoneInput(editCustomerForm.whatsappNumber); if (!validation.valid) setEditCustomerMessage({ type: 'error', text: validation.message }); }} />
                 {editCustomerMessage && <div className={`form-message ${editCustomerMessage.type}`} role="alert">{editCustomerMessage.text}</div>}
                 <button type="submit" className="save-client-btn" disabled={editCustomerSaving}>{editCustomerSaving ? 'Saving...' : 'Save changes'}</button>
               </form>

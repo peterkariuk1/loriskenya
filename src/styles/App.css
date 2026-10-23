@@ -36,7 +36,7 @@ html,
 body,
 #root {
   min-width: 100%;
-  overflow-x: auto;
+  overflow-x: clip;
 }
 
 body{

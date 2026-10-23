@@ -381,7 +381,8 @@ const Header = () => {
   }, []);
 
   return (
-    <nav ref={headerRef} className="header" aria-label="Main navigation">
+    <>
+      <nav ref={headerRef} className="header" aria-label="Main navigation">
       <Link to="/">
         <img className="loris-logo" src={logoImage} alt="Loris Logo" />
       </Link>
@@ -515,7 +516,9 @@ const Header = () => {
           </div>
         </Link>
       </div>
-    </nav>
+      </nav>
+      <div className="header-spacer" aria-hidden="true" />
+    </>
   );
 };
 

@@ -27,6 +27,8 @@ import { db, auth } from "../../firebase/firebaseConfig";
 import { getStockQuantity } from "../utils/inventory";
 import { isValidLocalKenyanPhone, normalizeKenyanPhone, toWhatsAppPhone } from "../utils/phone";
 import { getReceiptGreeting } from "../utils/receipt.js";
+import { REVIEW_URL } from "../utils/reviewConfig.js";
+import { shouldIncludeReviewLink } from "../utils/reviewLink.js";
 import "../styles/sales.css";
 
 const paymentMethods = [
@@ -39,9 +41,12 @@ const getStock = getStockQuantity;
 
 const formatPrice = (value) => `KSh ${Number(value || 0).toLocaleString()}`;
 
-const createReceiptMessage = (sale) => {
+const createReceiptMessage = (sale, includeReviewLink = false) => {
   const items = sale.items.map((item) => `${item.name} x${item.quantity}`).join(", ");
-  return `${getReceiptGreeting(sale.customerName)} thank you for shopping with Loris Kenya! Your receipt ${sale.receiptNumber} is ready.\n\nItems: ${items}\nTotal: ${formatPrice(sale.total)}\n\nWe appreciate your support.`;
+  const reviewLine = includeReviewLink
+    ? `\n\nEnjoyed shopping with us? Rate us here: ${REVIEW_URL}`
+    : "";
+  return `${getReceiptGreeting(sale.customerName)} thank you for shopping with Loris Kenya! Your receipt ${sale.receiptNumber} is ready.\n\nItems: ${items}\nTotal: ${formatPrice(sale.total)}\n\nWe appreciate your support.${reviewLine}`;
 };
 
 function Sales() {
@@ -252,11 +257,18 @@ function Sales() {
     }
   };
 
-  const openWhatsApp = () => {
+  const openWhatsApp = async () => {
     if (!lastSale?.customerPhone) return;
     const whatsappPhone = toWhatsAppPhone(lastSale.customerPhone);
     if (!whatsappPhone) return;
-    window.open(`https://wa.me/${whatsappPhone}?text=${encodeURIComponent(createReceiptMessage(lastSale))}`, "_blank", "noopener,noreferrer");
+    let includeReviewLink = lastSale.reviewLinkIncluded === true;
+    if (!includeReviewLink) {
+      includeReviewLink = await shouldIncludeReviewLink(lastSale);
+      if (includeReviewLink) {
+        setLastSale((current) => current ? { ...current, reviewLinkIncluded: true } : current);
+      }
+    }
+    window.open(`https://wa.me/${whatsappPhone}?text=${encodeURIComponent(createReceiptMessage(lastSale, includeReviewLink))}`, "_blank", "noopener,noreferrer");
   };
 
   const handlePhoneChange = (event) => {

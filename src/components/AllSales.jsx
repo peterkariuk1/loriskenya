@@ -3,6 +3,9 @@ import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { FiMessageCircle, FiRefreshCw } from "react-icons/fi";
 import { db } from "../../firebase/firebaseConfig";
 import { toWhatsAppPhone } from "../utils/phone";
+import { getReceiptGreeting } from "../utils/receipt.js";
+import { REVIEW_URL } from "../utils/reviewConfig.js";
+import { shouldIncludeReviewLink } from "../utils/reviewLink.js";
 import "../styles/sales.css";
 
 const formatPrice = (value) => `KSh ${Number(value || 0).toLocaleString()}`;
@@ -13,9 +16,12 @@ const formatDate = (value) => {
   return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString();
 };
 
-const createMessage = (sale) => {
+const createMessage = (sale, includeReviewLink = false) => {
   const items = (sale.items || []).map((item) => `${item.name} x${item.quantity}`).join(", ");
-  return `Hello${sale.customerName && sale.customerName !== "Walk-in" ? ` ${sale.customerName}` : ""}, thank you for shopping with Loris Kenya! Your receipt ${sale.receiptNumber} is ready.\n\nItems: ${items}\nTotal: ${formatPrice(sale.total)}`;
+  const reviewLine = includeReviewLink
+    ? `\n\nEnjoyed shopping with us? Rate us here: ${REVIEW_URL}`
+    : "";
+  return `${getReceiptGreeting(sale.customerName)} thank you for shopping with Loris Kenya! Your receipt ${sale.receiptNumber} is ready.\n\nItems: ${items}\nTotal: ${formatPrice(sale.total)}${reviewLine}`;
 };
 
 function AllSales() {
@@ -43,11 +49,17 @@ function AllSales() {
     loadSales();
   }, []);
 
-  const openWhatsApp = (sale) => {
+  const openWhatsApp = async (sale) => {
     if (!sale.customerPhone) return;
     const whatsappPhone = toWhatsAppPhone(sale.customerPhone);
     if (!whatsappPhone) return;
-    window.open(`https://wa.me/${whatsappPhone}?text=${encodeURIComponent(createMessage(sale))}`, "_blank", "noopener,noreferrer");
+    const includeReviewLink = await shouldIncludeReviewLink(sale);
+    if (includeReviewLink) {
+      setSales((current) => current.map((item) => (
+        item.id === sale.id ? { ...item, reviewLinkIncluded: true } : item
+      )));
+    }
+    window.open(`https://wa.me/${whatsappPhone}?text=${encodeURIComponent(createMessage(sale, includeReviewLink))}`, "_blank", "noopener,noreferrer");
   };
 
   return (

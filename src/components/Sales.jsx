@@ -26,6 +26,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { db, auth } from "../../firebase/firebaseConfig";
 import { getStockQuantity } from "../utils/inventory";
 import { isValidLocalKenyanPhone, normalizeKenyanPhone, toWhatsAppPhone } from "../utils/phone";
+import { getReceiptGreeting } from "../utils/receipt.js";
 import "../styles/sales.css";
 
 const paymentMethods = [
@@ -40,7 +41,7 @@ const formatPrice = (value) => `KSh ${Number(value || 0).toLocaleString()}`;
 
 const createReceiptMessage = (sale) => {
   const items = sale.items.map((item) => `${item.name} x${item.quantity}`).join(", ");
-  return `Hello${sale.customerName ? ` ${sale.customerName}` : ""}, thank you for shopping with Loris Kenya! Your receipt ${sale.receiptNumber} is ready.\n\nItems: ${items}\nTotal: ${formatPrice(sale.total)}\n\nWe appreciate your support.`;
+  return `${getReceiptGreeting(sale.customerName)} thank you for shopping with Loris Kenya! Your receipt ${sale.receiptNumber} is ready.\n\nItems: ${items}\nTotal: ${formatPrice(sale.total)}\n\nWe appreciate your support.`;
 };
 
 function Sales() {

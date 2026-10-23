@@ -339,9 +339,14 @@ const Header = () => {
             {placeholders[index]}
           </span>
         )}
-        <div className="search-button-container" onClick={() => handleSearch()}>
-          <img src={searchIcon} alt="Search" />
-        </div>
+        <button
+          type="button"
+          className="search-button-container"
+          aria-label="Search"
+          onClick={() => handleSearch()}
+        >
+          <img src={searchIcon} alt="" />
+        </button>
 
         {showSuggestions && (
           <div className="search-suggestions" ref={suggestionsRef}>
@@ -395,13 +400,15 @@ const Header = () => {
 
       <div className="right">
         <div className="nav-profile-container" ref={profileDropdownRef}>
-          <div 
+          <button
+            type="button"
             className="profile-icon-wrapper" 
+            aria-label={isAuthenticated ? "Open account menu" : "Sign in"}
             onClick={() => isAuthenticated ? setShowProfileMenu(!showProfileMenu) : navigate("/login")}
           >
-            <img src={profileIcon} alt="Profile" />
+            <img src={profileIcon} alt="" />
             {isAuthenticated && <span className="auth-indicator" />}
-          </div>
+          </button>
           
           {isAuthenticated && showProfileMenu && (
             <div className="profile-dropdown">
@@ -434,12 +441,12 @@ const Header = () => {
           )}
         </div>
         
-        <Link to="/checkout">
+        <Link to="/checkout" aria-label={`Shopping cart, ${cartItemCount} items`}>
           <div className="cart-container">
-            <img src={cartIcon} alt="Cart" />
+            <img src={cartIcon} alt="" />
             {cartItemCount > 0 && (
               <div className="cart-counter-container">
-                <p>{cartItemCount}</p>
+                <p>{cartItemCount > 999 ? "999+" : cartItemCount}</p>
               </div>
             )}
           </div>

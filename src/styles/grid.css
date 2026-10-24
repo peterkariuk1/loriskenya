@@ -643,6 +643,8 @@
   padding: 20px;
   background-color: var(--secondary-color);
   position: relative;
+  aspect-ratio: 1 / 1;
+  min-width: 0;
 }
 
 .modal-bestseller-badge {

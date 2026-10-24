@@ -3,7 +3,7 @@ export const getStockQuantity = (product) => {
   return Number.isFinite(quantity) && quantity >= 0 ? quantity : 0;
 };
 
-export const isProductAvailable = (product) => getStockQuantity(product) > 0;
+export const isProductAvailable = (product) => product?.inStock !== false && getStockQuantity(product) > 0;
 
 export const getStockLabel = (product) => (
   isProductAvailable(product) ? "In Stock" : "Out of Stock"

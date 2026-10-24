@@ -50,7 +50,9 @@
 /* Product image container */
 .product-page-image {
   flex: 1;
+  width: 100%;
   max-width: 50%;
+  aspect-ratio: 1 / 1;
   min-height: 280px;
   display: flex;
   justify-content: center;
@@ -302,6 +304,7 @@
   
   .product-page-image {
     max-width: 100%;
+    width: 100%;
     min-height: 220px;
     margin: 0 auto;
   }

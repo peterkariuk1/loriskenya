@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { db, auth } from "../../firebase/firebaseConfig";
 import { setDoc, doc, getDoc } from "firebase/firestore";
-import { getStockQuantity } from "../utils/inventory";
+import { getStockQuantity, isProductAvailable } from "../utils/inventory";
 import { normalizeKenyanPhone } from "../utils/phone";
 import emailjs from "@emailjs/browser";
 
@@ -94,10 +94,10 @@ const Checkout = () => {
       setIsProcessing(true);
       const stockChecks = await Promise.all(cartItems.map((item) => getDoc(doc(db, "products", item.id))));
       const unavailable = stockChecks.find((snapshot, index) => (
-        !snapshot.exists() || getStockQuantity(snapshot.data()) < cartItems[index].quantity
+        !snapshot.exists() || !isProductAvailable(snapshot.data()) || getStockQuantity(snapshot.data()) < cartItems[index].quantity
       ));
       if (unavailable) {
-        throw new Error("One or more items are no longer available in the requested quantity.");
+        throw new Error("Sorry, that's more than we currently have available.");
       }
 
       const user = auth.currentUser;
@@ -155,10 +155,10 @@ const Checkout = () => {
   const handleWhatsAppOrder = async (orderId) => {
     const stockChecks = await Promise.all(cartItems.map((item) => getDoc(doc(db, "products", item.id))));
     const unavailable = stockChecks.find((snapshot, index) => (
-      !snapshot.exists() || getStockQuantity(snapshot.data()) < cartItems[index].quantity
+      !snapshot.exists() || !isProductAvailable(snapshot.data()) || getStockQuantity(snapshot.data()) < cartItems[index].quantity
     ));
     if (unavailable) {
-      alert("One or more items are no longer available in the requested quantity.");
+      alert("Sorry, that's more than we currently have available.");
       return;
     }
     let message = `Hello Loris Kenya, I would like to place an order (${orderId}):\n\n`;
@@ -257,6 +257,7 @@ const Checkout = () => {
                         "https://placehold.co/300x300?text=No+Image"
                       }
                       alt={item.name}
+                      loading="lazy"
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src =

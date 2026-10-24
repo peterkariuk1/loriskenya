@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { auth } from "../../firebase/firebaseConfig.js";
 import { onAuthStateChanged } from "firebase/auth";
-import { getStockQuantity } from "../utils/inventory";
+import { getStockQuantity, isProductAvailable } from "../utils/inventory";
 
 // Create the context
 const CartContext = createContext();
@@ -50,7 +50,7 @@ export const CartProvider = ({ children }) => {
   // Add item to cart
   const addToCart = (product, quantity = 1) => {
     const availableStock = getStockQuantity(product);
-    if (availableStock < 1 || quantity < 1) return false;
+    if (!isProductAvailable(product) || quantity < 1) return false;
 
     setCart(prevCart => {
       // Check if item already exists in cart

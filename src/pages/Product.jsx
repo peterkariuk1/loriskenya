@@ -279,7 +279,7 @@ const Product = () => {
             {formatPrice(product.price)}
           </div>
           <p className={`product-stock-status ${isProductAvailable(product) ? "in-stock" : "out-of-stock"}`}>
-            {isProductAvailable(product) ? `${getStockQuantity(product)} available` : "Out of Stock"}
+            {isProductAvailable(product) ? "In stock" : "Out of stock"}
           </p>
 
           {product.description && (

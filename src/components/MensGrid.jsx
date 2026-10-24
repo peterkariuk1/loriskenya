@@ -7,6 +7,7 @@ import { useCart } from "../context/CartContext.jsx";
 import { getCachedProducts, getProducts } from "../data/productStore.js";
 import { rankProducts } from "../utils/personalizationRanking.js";
 import { recordAddToCart } from "../utils/personalizationStore.js";
+import { isProductAvailable } from "../utils/inventory.js";
 import { useLocation, useNavigationType } from "react-router-dom";
 import { getStorefrontGridState, useStorefrontGridState } from "../hooks/useStorefrontScrollRestoration.js";
 
@@ -116,7 +117,7 @@ const MenPerfumes = () => {
 
   // Add to cart function
   const handleAddToCart = () => {
-    if (selectedProduct && selectedProduct.inStock !== false) {
+    if (selectedProduct && isProductAvailable(selectedProduct)) {
       // Add the selected product with quantity
       addToCart(selectedProduct, quantity);
 
@@ -311,6 +312,7 @@ const MenPerfumes = () => {
                 <img
                   src={getProductImage(selectedProduct)}
                   alt={selectedProduct.name}
+                  loading="lazy"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = defaultImage;
@@ -327,6 +329,9 @@ const MenPerfumes = () => {
                 <p className="product-modal-category">
                   <span className="category-label">Category: </span>
                   {selectedProduct.category || "Uncategorized"}
+                </p>
+                <p className={`product-stock-status ${isProductAvailable(selectedProduct) ? "in-stock" : "out-of-stock"}`}>
+                  {isProductAvailable(selectedProduct) ? "In stock" : "Out of stock"}
                 </p>
 
                 {/* Add quantities display in modal */}
@@ -380,8 +385,8 @@ const MenPerfumes = () => {
                   <div className="product-modal-price">
                     {formatPrice(selectedProduct.price)}
                   </div>
-                  <button className="add-to-cart-btn" onClick={handleAddToCart}>
-                    Add to Cart
+                  <button className="add-to-cart-btn" onClick={handleAddToCart} disabled={!isProductAvailable(selectedProduct)}>
+                    {isProductAvailable(selectedProduct) ? "Add to Cart" : "Out of stock"}
                   </button>
                 </div>
               </div>

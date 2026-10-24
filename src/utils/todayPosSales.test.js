@@ -9,11 +9,13 @@ test("only counts confirmed POS orders, deduplicated, and supports string/partia
     { id: "web", orderMethod: "online", paymentStatus: "confirmed", paymentMethod: "card", total: 900 },
     { id: "cancel", orderMethod: "pos", status: "cancelled", paymentStatus: "confirmed", paymentMethod: "cash", total: 900 },
     { id: "partial", orderMethod: "pos", paymentStatus: "confirmed", paymentMethod: "mpesa", total: 500, amountPaid: "200" },
+    { id: "unclassified-partial", orderMethod: "pos", paymentStatus: "partial", paymentMethod: "cash", total: 500 },
   ]);
   assert.equal(summary.revenue, 1400);
   assert.equal(summary.transactions, 2);
   assert.equal(summary.averageSale, 700);
   assert.deepEqual(summary.paymentBreakdown, { cash: 1200, mpesa: 200 });
+  assert.deepEqual(summary.unclassified, ["unclassified-partial"]);
 });
 
 test("uses Nairobi midnight boundaries across UTC dates", () => {

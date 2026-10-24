@@ -299,7 +299,7 @@ const Dashboard = ({ onNavigateToTab }) => {
             {todaySales.transactions === 0 && <p className="empty-state">No qualifying POS sales today.</p>}
             <div className="payment-breakdown"><strong>By payment method</strong>{Object.entries(todaySales.paymentBreakdown).length ? Object.entries(todaySales.paymentBreakdown).map(([method, amount]) => <span key={method}>{method.toUpperCase()}: KSh {amount.toLocaleString()}</span>) : <span>—</span>}</div>
             {todaySales.unclassified.length > 0 && <p className="dashboard-inline-error">{todaySales.unclassified.length} POS order(s) could not be classified.</p>}
-            <small>Updated {salesUpdatedAt?.toLocaleTimeString('en-KE') || '—'} (Africa/Nairobi)</small>
+            <small>Updated {salesUpdatedAt?.toLocaleTimeString('en-KE', { timeZone: 'Africa/Nairobi' }) || '—'} (Africa/Nairobi)</small>
           </>}
         </section>
         <section className="dashboard-card stock-movements-card">

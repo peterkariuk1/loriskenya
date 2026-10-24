@@ -1,5 +1,7 @@
 const EXCLUDED_STATUSES = new Set(["cancelled", "canceled", "void", "voided", "refunded", "refund", "failed"]);
 const UNPAID_STATUSES = new Set(["unpaid", "pending", "failed", "declined"]);
+const PARTIAL_STATUSES = new Set(["partial", "partially paid", "partially_paid"]);
+const PAID_STATUSES = new Set(["confirmed", "paid", "completed", ...PARTIAL_STATUSES]);
 
 export function nairobiDayBounds(now = new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -31,12 +33,20 @@ export function aggregateTodayPosSales(orders = []) {
     if (order.orderMethod !== "pos") continue;
     const status = statusText(order.status);
     const paymentStatus = statusText(order.paymentStatus);
-    if (EXCLUDED_STATUSES.has(status) || EXCLUDED_STATUSES.has(paymentStatus) || UNPAID_STATUSES.has(paymentStatus)) continue;
+    if (EXCLUDED_STATUSES.has(status) || EXCLUDED_STATUSES.has(paymentStatus)
+      || UNPAID_STATUSES.has(status) || UNPAID_STATUSES.has(paymentStatus)) continue;
     if (order.refunded === true || order.voided === true || order.cancelled === true) continue;
     const total = amount(order.total);
-    const paid = amount(order.amountPaid ?? order.paidAmount ?? order.amountReceived) ?? total;
-    const refunds = amount(order.refundedAmount ?? order.refundAmount) ?? 0;
-    if (paid === null || !String(order.paymentStatus ?? "").trim() || !String(order.paymentMethod ?? "").trim()) {
+    const paidField = order.amountPaid ?? order.paidAmount ?? order.amountReceived;
+    const paid = paidField === undefined ? (PARTIAL_STATUSES.has(paymentStatus) ? null : total) : amount(paidField);
+    const refundField = order.refundedAmount ?? order.refundAmount ?? 0;
+    const refundAmounts = Array.isArray(order.refunds)
+      ? order.refunds.map((refund) => amount(refund?.amount ?? refund?.total ?? refund))
+      : [amount(refundField)];
+    const refunds = refundAmounts.every((value) => value !== null)
+      ? refundAmounts.reduce((sum, value) => sum + value, 0)
+      : null;
+    if (paid === null || refunds === null || !PAID_STATUSES.has(paymentStatus) || !String(order.paymentMethod ?? "").trim()) {
       unclassified.push(id);
       continue;
     }

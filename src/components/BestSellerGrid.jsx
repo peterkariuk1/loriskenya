@@ -4,17 +4,16 @@ import shareIcon from "../assets/share-icon.png";
 import ProductCard from "./ProductCard";
 import EditorialHeading from "./EditorialHeading";
 import { useCart } from "../context/CartContext.jsx";
-import { db } from "../../firebase/firebaseConfig.js";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { getCachedProducts, getProducts } from "../data/productStore.js";
 import { rankProducts } from "../utils/personalizationRanking.js";
 import { recordAddToCart } from "../utils/personalizationStore.js";
 
 const BestSellerGrid = () => {
   // State for products
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.isBestSeller === true)));
+  const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
   const [visibleCount, setVisibleCount] = useState(8);
-  const [visibleProducts, setVisibleProducts] = useState([]);
+  const [visibleProducts, setVisibleProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.isBestSeller === true)).slice(0, 8));
   const [isAllLoaded, setIsAllLoaded] = useState(false);
 
   // Modal state
@@ -35,27 +34,17 @@ const BestSellerGrid = () => {
   useEffect(() => {
     const fetchBestSellerProducts = async () => {
       try {
-        setLoading(true);
+        if (getCachedProducts().length === 0) setLoading(true);
         
         // Create a query against the "products" collection where isBestSeller is true
-        const productsRef = collection(db, "products");
-        const bestSellersQuery = query(productsRef, where("isBestSeller", "==", true));
-        
-        const querySnapshot = await getDocs(bestSellersQuery);
-        
-        // Process and set products
-        const bestSellerProducts = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const allProducts = await getProducts();
+        const bestSellerProducts = allProducts.filter((product) => product.isBestSeller === true);
         
         const rankedProducts = rankProducts(bestSellerProducts);
         setProducts(rankedProducts);
         setVisibleProducts(rankedProducts.slice(0, visibleCount));
         setIsAllLoaded(visibleCount >= bestSellerProducts.length);
         
-        console.log("Total Best Seller Products:", bestSellerProducts.length);
-        console.log("Visible Best Seller Count:", Math.min(visibleCount, bestSellerProducts.length));
         
       } catch (error) {
         console.error("Error fetching best seller products:", error);

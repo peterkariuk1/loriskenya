@@ -8,6 +8,7 @@ import logoImage from "../assets/lorislogo.png";
 import shareIcon from "../assets/share-icon.png";
 import categoryIcon from "../assets/category-icon.png";
 import { getStockQuantity, isProductAvailable } from "../utils/inventory";
+import { getCachedProduct, updateCachedProduct } from "../data/productStore.js";
 
 const Product = () => {
   // Use both route params (for backward compatibility) and search params
@@ -18,8 +19,8 @@ const Product = () => {
 
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState(() => productId ? getCachedProduct(productId) : null);
+  const [loading, setLoading] = useState(() => !productId || !getCachedProduct(productId));
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [notification, setNotification] = useState({
@@ -38,12 +39,13 @@ const Product = () => {
       }
 
       try {
-        setLoading(true);
         const productRef = doc(db, "products", productId);
         const productSnap = await getDoc(productRef);
 
         if (productSnap.exists()) {
-          setProduct({ id: productSnap.id, ...productSnap.data() });
+          const freshProduct = { id: productSnap.id, ...productSnap.data() };
+          setProduct(freshProduct);
+          updateCachedProduct(freshProduct);
         } else {
           setError("Product not found");
         }

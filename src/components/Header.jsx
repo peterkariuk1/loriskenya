@@ -7,7 +7,8 @@ import profileIcon from "../assets/user.png";
 import "../styles/nav.css";
 import { useCart } from "../context/CartContext";
 import { db, auth } from "../../firebase/firebaseConfig.js";
-import { collection, getDocs, query, limit, getDoc, doc } from "firebase/firestore";
+import { getDoc, doc } from "firebase/firestore";
+import { getProducts } from "../data/productStore.js";
 import { signOut } from "firebase/auth";
 import { FiLogOut, FiUser, FiSettings, FiShoppingBag } from "react-icons/fi";
 
@@ -84,13 +85,7 @@ const Header = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const productsRef = collection(db, "products");
-        const productsQuery = query(productsRef, limit(500));
-        const snapshot = await getDocs(productsQuery);
-        const productsData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const productsData = await getProducts();
         setAllProducts(productsData);
       } catch (error) {
         console.error("Error fetching products for search:", error);

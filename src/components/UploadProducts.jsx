@@ -9,6 +9,7 @@ import { db } from "../../firebase/firebaseConfig";
 import { collection, addDoc, getDocs, query, where, Timestamp, serverTimestamp } from "firebase/firestore";
 import axios from "axios";
 import { buildProductVector, VECTOR_VERSION } from "../utils/productVector.js";
+import { invalidateProducts } from "../data/productStore.js";
 import {
   countDescriptionWords,
   DESCRIPTION_WORD_LIMIT,
@@ -252,6 +253,7 @@ const UploadProducts = () => {
         console.warn("Product vector could not be computed during upload.", error);
       }
       await addDoc(collection(db, "products"), productData);
+      invalidateProducts();
       
       // Success!
       setUploadProgress(100);

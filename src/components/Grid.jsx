@@ -2,8 +2,7 @@ import "../styles/grid.css";
 import { useState, useEffect, useRef } from "react";
 import shareIcon from "../assets/share-icon.png";
 import ProductCard from "./ProductCard";
-import { db } from "../../firebase/firebaseConfig.js";
-import { collection, getDocs, query, limit, orderBy } from "firebase/firestore";
+import { getCachedProducts, getProducts } from "../data/productStore.js";
 import { useCart } from "../context/CartContext";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { FiArrowLeft } from 'react-icons/fi';
@@ -12,8 +11,15 @@ import { isDefaultGridSort, rankProducts } from "../utils/personalizationRanking
 import { recordAddToCart } from "../utils/personalizationStore.js";
 
 const Grid = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const sortBy = searchParams.get("sort") || "newest";
+  const [products, setProducts] = useState(() => {
+    const cached = getCachedProducts();
+    if (sortBy === "price-high-to-low") return [...cached].filter((product) => product.price !== undefined).sort((a, b) => Number(b.price) - Number(a.price));
+    if (sortBy === "price-low-to-high") return [...cached].filter((product) => product.price !== undefined).sort((a, b) => Number(a.price) - Number(b.price));
+    return cached;
+  });
+  const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const itemsPerPage = 18;
@@ -34,9 +40,6 @@ const Grid = () => {
 
   const { addToCart } = useCart();
 
-  // Add search params from URL
-  const [searchParams] = useSearchParams();
-
   // Add navigate function near other hooks
   const navigate = useNavigate();
 
@@ -44,7 +47,6 @@ const Grid = () => {
   const minPrice = searchParams.get("min_price") ? parseInt(searchParams.get("min_price")) : 0;
   const maxPrice = searchParams.get("max_price") ? parseInt(searchParams.get("max_price")) : Infinity;
   const category = searchParams.get("category") || "";
-  const sortBy = searchParams.get("sort") || "newest";
   const searchQuery = searchParams.get("search") || "";
 
   useEffect(() => {
@@ -181,82 +183,19 @@ const Grid = () => {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        setLoading(true);
-        console.log("Fetching products from products collection...");
-
-        // Reference to the products collection
-        const productsRef = collection(db, "products");
-        
-        // First check if there are any products at all (for debugging)
-        const testSnapshot = await getDocs(productsRef);
-        console.log(`Total products in collection: ${testSnapshot.docs.length}`);
-        
-        if (testSnapshot.docs.length === 0) {
-          console.log("Collection is empty - no products found");
-          setProducts([]);
-          setLoading(false);
-          return;
-        }
-        
-        // Check if inStock field exists and is causing filtering issues
-        let sampleDoc = testSnapshot.docs[0].data();
-        console.log("Sample document fields:", Object.keys(sampleDoc));
-        console.log("Sample inStock value:", sampleDoc.inStock);
-        
-        // Create query - temporarily remove the inStock filter if it's causing issues
-        let productsQuery;
-
-        // Choose sort order based on URL parameter
-        switch(sortBy) {
-          case "price-high-to-low":
-            productsQuery = query(
-              productsRef, 
-              // Only add inStock filter if needed
-              // where("inStock", "==", true),
-              orderBy("price", "desc"), 
-              limit(1000)
-            );
-            break;
-          case "price-low-to-high":
-            productsQuery = query(
-              productsRef, 
-              // where("inStock", "==", true),
-              orderBy("price", "asc"), 
-              limit(1000)
-            );
-            break;
-          case "newest":
-          default:
-            productsQuery = query(
-              productsRef, 
-              // where("inStock", "==", true),
-              orderBy("createdAt", "desc"), 
-              limit(1000)
-            );
-            break;
-        }
-
-        // Get products
-        const querySnapshot = await getDocs(productsQuery);
-
-        // Process products data
-        const productsData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          // Set default values for critical fields if missing
-          price: doc.data().price || 0,
-          inStock: doc.data().inStock !== false, // Default to true if not explicitly false
-          name: doc.data().name || "Unnamed Product",
-          category: doc.data().category || "Uncategorized"
+        const allProducts = await getProducts();
+        const orderedProducts = sortBy === "price-high-to-low"
+          ? [...allProducts].filter((product) => product.price !== undefined).sort((a, b) => Number(b.price) - Number(a.price))
+          : sortBy === "price-low-to-high"
+            ? [...allProducts].filter((product) => product.price !== undefined).sort((a, b) => Number(a.price) - Number(b.price))
+            : allProducts;
+        const productsData = orderedProducts.map((product) => ({
+          ...product,
+          price: product.price || 0,
+          inStock: product.inStock !== false,
+          name: product.name || "Unnamed Product",
+          category: product.category || "Uncategorized",
         }));
-
-        console.log(`Fetched ${productsData.length} products from products collection`);
-        
-        // Log first product for debugging
-        if (productsData.length > 0) {
-          console.log("Sample product data:", productsData[0]);
-        }
-        
         setProducts(productsData);
         setLoading(false);
       } catch (error) {
@@ -266,7 +205,7 @@ const Grid = () => {
     }
 
     fetchProducts();
-  }, [sortBy]); // Re-fetch when sort order changes
+  }, [sortBy]);
 
   // Filter products based on URL parameters
   const filteredProducts = products.filter(product => {

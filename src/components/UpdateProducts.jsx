@@ -18,6 +18,7 @@ import '../styles/update.css';
 import { FiSearch, FiEdit, FiCheck, FiX } from 'react-icons/fi';
 import { getStockQuantity, getStockLabel } from '../utils/inventory';
 import { buildProductVector, VECTOR_VERSION } from '../utils/productVector.js';
+import { invalidateProducts } from '../data/productStore.js';
 import {
   countDescriptionWords,
   DESCRIPTION_WORD_LIMIT,
@@ -237,6 +238,7 @@ function UpdateProducts({ onAddProduct }) {
         createdAt: serverTimestamp(),
       });
       await batch.commit();
+      invalidateProducts();
 
       const updatedProduct = { ...selectedProduct, stockQuantity: newQty, inStock: newQty > 0 };
       setSelectedProduct(updatedProduct);
@@ -291,6 +293,7 @@ function UpdateProducts({ onAddProduct }) {
         console.warn("Product vector could not be computed during update.", error);
       }
       await updateDoc(productRef, updates);
+      invalidateProducts();
 
       // Update local state
       const updatedProducts = products.map(product => {

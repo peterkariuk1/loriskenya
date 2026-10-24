@@ -4,17 +4,16 @@ import shareIcon from "../assets/share-icon.png";
 import ProductCard from "./ProductCard";
 import EditorialHeading from "./EditorialHeading";
 import { useCart } from "../context/CartContext.jsx";
-import { db } from "../../firebase/firebaseConfig.js";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { getCachedProducts, getProducts } from "../data/productStore.js";
 import { rankProducts } from "../utils/personalizationRanking.js";
 import { recordAddToCart } from "../utils/personalizationStore.js";
 
 const MenPerfumes = () => {
   // State for products
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.gender === "men")));
+  const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
   const [visibleCount, setVisibleCount] = useState(8);
-  const [visibleProducts, setVisibleProducts] = useState([]);
+  const [visibleProducts, setVisibleProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.gender === "men")).slice(0, 8));
   const [isAllLoaded, setIsAllLoaded] = useState(false);
 
   // Modal state
@@ -35,30 +34,17 @@ const MenPerfumes = () => {
   useEffect(() => {
     const fetchMenProducts = async () => {
       try {
-        setLoading(true);
+        if (getCachedProducts().length === 0) setLoading(true);
 
         // Create a query against the "products" collection where gender is "men"
-        const productsRef = collection(db, "products");
-        const menQuery = query(productsRef, where("gender", "==", "men"));
-
-        const querySnapshot = await getDocs(menQuery);
-
-        // Process and set products
-        const menProducts = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const allProducts = await getProducts();
+        const menProducts = allProducts.filter((product) => product.gender === "men");
 
         const rankedProducts = rankProducts(menProducts);
         setProducts(rankedProducts);
         setVisibleProducts(rankedProducts.slice(0, visibleCount));
         setIsAllLoaded(visibleCount >= menProducts.length);
 
-        console.log("Total Men's Products:", menProducts.length);
-        console.log(
-          "Visible Men's Products Count:",
-          Math.min(visibleCount, menProducts.length)
-        );
       } catch (error) {
         console.error("Error fetching men's products:", error);
       } finally {

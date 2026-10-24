@@ -22,9 +22,14 @@ import {
   FiMessageCircle
 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
+import { BsCashCoin } from "react-icons/bs";
+import { MdOutlineSendToMobile } from "react-icons/md";
+
+
 
 import { db, auth } from "../../firebase/firebaseConfig";
 import { getStockQuantity } from "../utils/inventory";
+import { invalidateProducts } from "../data/productStore.js";
 import { isValidLocalKenyanPhone, normalizeKenyanPhone, toWhatsAppPhone } from "../utils/phone";
 import { getReceiptGreeting } from "../utils/receipt.js";
 import { REVIEW_URL } from "../utils/reviewConfig.js";
@@ -32,8 +37,8 @@ import { shouldIncludeReviewLink } from "../utils/reviewLink.js";
 import "../styles/sales.css";
 
 const paymentMethods = [
-  { value: "cash", label: "Cash", icon: "💵" },
-  { value: "mpesa", label: "M-PESA", icon: "📱" },
+  { value: "cash", label: "Cash", icon: <BsCashCoin/> },
+  { value: "mpesa", label: "M-PESA", icon: <MdOutlineSendToMobile/> },
   { value: "card", label: "Card", icon: "💳" },
 ];
 
@@ -234,6 +239,7 @@ function Sales() {
           inStock: previousStock - item.quantity > 0,
         });
       }));
+      invalidateProducts();
       const saleRef = await addDoc(collection(db, "orders"), saleData);
       const sale = { ...saleData, id: saleRef.id };
       setCart([]);

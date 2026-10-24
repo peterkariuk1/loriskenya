@@ -3,17 +3,16 @@ import React, { useState, useEffect } from "react";
 import shareIcon from "../assets/share-icon.png";
 import ProductCard from "./ProductCard";
 import { useCart } from "../context/CartContext.jsx";
-import { db } from "../../firebase/firebaseConfig.js";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { getCachedProducts, getProducts } from "../data/productStore.js";
 import { rankProducts } from "../utils/personalizationRanking.js";
 import { recordAddToCart } from "../utils/personalizationStore.js";
 
 const LadiesGrid = () => {
   // State for products
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.gender === "women")));
+  const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
   const [visibleCount, setVisibleCount] = useState(8);
-  const [visibleProducts, setVisibleProducts] = useState([]);
+  const [visibleProducts, setVisibleProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.gender === "women")).slice(0, 8));
   const [isAllLoaded, setIsAllLoaded] = useState(false);
 
   // Modal state
@@ -34,27 +33,17 @@ const LadiesGrid = () => {
   useEffect(() => {
     const fetchWomenProducts = async () => {
       try {
-        setLoading(true);
+        if (getCachedProducts().length === 0) setLoading(true);
         
         // Create a query against the "products" collection where gender is "women"
-        const productsRef = collection(db, "products");
-        const womenQuery = query(productsRef, where("gender", "==", "women"));
-        
-        const querySnapshot = await getDocs(womenQuery);
-        
-        // Process and set products
-        const womenProducts = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const allProducts = await getProducts();
+        const womenProducts = allProducts.filter((product) => product.gender === "women");
         
         const rankedProducts = rankProducts(womenProducts);
         setProducts(rankedProducts);
         setVisibleProducts(rankedProducts.slice(0, visibleCount));
         setIsAllLoaded(visibleCount >= womenProducts.length);
         
-        console.log("Total Women's Products:", womenProducts.length);
-        console.log("Visible Women's Products Count:", Math.min(visibleCount, womenProducts.length));
         
       } catch (error) {
         console.error("Error fetching women's products:", error);

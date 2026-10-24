@@ -17,8 +17,9 @@ import newsletterVideo from "../assets/loris_footer.mp4";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
 
-const mapsUrl = "https://maps.app.goo.gl/eo7fAai59BYPWZGr6";
-const mapsEmbedUrl = "https://www.google.com/maps?q=Loris+Parfum%2C+-1.2812723%2C36.8185782&output=embed";
+const shopCoordinates = "-1.2812723,36.8185782";
+const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${shopCoordinates}`;
+const mapsEmbedUrl = `https://www.google.com/maps?q=${shopCoordinates}&z=17&output=embed`;
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -162,7 +163,7 @@ const Footer = () => {
           <h3>Visit Us</h3>
           <p>Loris Parfum, Nairobi, Kenya</p>
           <a href="tel:+254753380900">0753 380 900</a>
-          <a href={mapsUrl} target="_blank" rel="noreferrer" className="directions-link">Get Directions</a>
+          <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="directions-link">Get Directions</a>
           <div className="map-preview">
             <iframe
               src={mapsEmbedUrl}

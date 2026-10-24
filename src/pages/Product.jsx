@@ -44,6 +44,16 @@ const Product = () => {
         return;
       }
 
+      const cachedProduct = getCachedProduct(productId);
+      if (cachedProduct) {
+        setProduct(cachedProduct);
+        setError(null);
+        setLoading(false);
+      } else {
+        setProduct(null);
+        setError(null);
+        setLoading(true);
+      }
       try {
         const productRef = doc(db, "products", productId);
         const productSnap = await getDoc(productRef);
@@ -57,7 +67,7 @@ const Product = () => {
         }
       } catch (err) {
         console.error("Error fetching product:", err);
-        setError("Failed to load product");
+        if (!cachedProduct) setError("Failed to load product");
       } finally {
         setLoading(false);
       }

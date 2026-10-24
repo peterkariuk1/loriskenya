@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import logoImage from "../assets/lorislogo.png";
 import searchIcon from "../assets/search.png";
@@ -9,6 +9,7 @@ import { useCart } from "../context/CartContext";
 import { db, auth } from "../../firebase/firebaseConfig.js";
 import { getDoc, doc } from "firebase/firestore";
 import { getProducts } from "../data/productStore.js";
+import { saveStorefrontEntry } from "../hooks/useStorefrontScrollRestoration.js";
 import { signOut } from "firebase/auth";
 import { FiLogOut, FiUser, FiSettings, FiShoppingBag } from "react-icons/fi";
 
@@ -51,6 +52,7 @@ const placeholders = [
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const searchInputRef = useRef(null);
   const suggestionsRef = useRef(null);
   const profileDropdownRef = useRef(null);
@@ -184,7 +186,9 @@ const Header = () => {
 
   const handleSuggestionClick = (suggestion) => {
     if (suggestion.type === "product") {
-      navigate(`/product/?category=${encodeURIComponent(suggestion.category || "Uncategorized")}&pid=${suggestion.id}`);
+      const fromStorefront = location.pathname === "/" || location.pathname === "/all-products";
+      if (fromStorefront) saveStorefrontEntry(location.key);
+      navigate(`/product/?category=${encodeURIComponent(suggestion.category || "Uncategorized")}&pid=${suggestion.id}`, { state: { fromStorefront } });
     } else if (suggestion.type === "category") {
       navigate(`/?category=${encodeURIComponent(suggestion.name)}`);
     }

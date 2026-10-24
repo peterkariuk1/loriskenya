@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion as Motion, useReducedMotion } from "motion/react";
 import categoryIcon from "../assets/category-icon.png";
 import shareIcon from "../assets/share-icon.png";
-import { STOREFRONT_SCROLL_KEY } from "../hooks/useStorefrontScrollRestoration";
+import { saveStorefrontEntry } from "../hooks/useStorefrontScrollRestoration";
 import { getStockQuantity, isProductAvailable } from "../utils/inventory";
 import { recordClick } from "../utils/personalizationStore.js";
 
@@ -35,6 +35,7 @@ const getProductImage = (product) => {
 
 const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
   const [quantity, setQuantity] = useState(1);
   const isAvailable = isProductAvailable(product);
@@ -45,14 +46,8 @@ const ProductCard = ({ product, formatPrice, onAddToCart, onShare }) => {
 
   const openDetails = () => {
     recordClick(product);
-    sessionStorage.setItem(
-      STOREFRONT_SCROLL_KEY,
-      JSON.stringify({
-        path: `${window.location.pathname}${window.location.search}`,
-        scrollY: window.scrollY,
-      })
-    );
-    navigate(productUrl);
+    saveStorefrontEntry(location.key);
+    navigate(productUrl, { state: { fromStorefront: true } });
   };
 
   const handleCardKeyDown = (event) => {

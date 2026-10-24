@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigationType } from "react-router-dom";
 import Header from "../components/Header.jsx";
 import Banner from "../components/Banner.jsx";
 import Categories from "../components/Categories.jsx";
@@ -12,7 +12,8 @@ import { getSectionOrder } from "../utils/personalizationRanking.js";
 
 const Home = () => {
   const location = useLocation();
-  useStorefrontScrollRestoration(`${location.pathname}${location.search}`);
+  const navigationType = useNavigationType();
+  useStorefrontScrollRestoration(location, navigationType);
 
   return (
     <>

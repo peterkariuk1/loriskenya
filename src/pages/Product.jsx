@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useParams, useSearchParams, Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useLayoutEffect } from "react";
+import { useParams, useSearchParams, Link, useNavigate, useLocation, useNavigationType } from "react-router-dom";
 import { db } from "../../firebase/firebaseConfig.js";
 import { doc, getDoc } from "firebase/firestore";
 import { useCart } from "../context/CartContext.jsx";
@@ -18,6 +18,8 @@ const Product = () => {
   const categoryFromUrl = searchParams.get("category");
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const navigationType = useNavigationType();
   const { addToCart } = useCart();
   const [product, setProduct] = useState(() => productId ? getCachedProduct(productId) : null);
   const [loading, setLoading] = useState(() => !productId || !getCachedProduct(productId));
@@ -28,6 +30,10 @@ const Product = () => {
     message: '',
   });
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  useLayoutEffect(() => {
+    if (navigationType === "PUSH") window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [location.key, navigationType]);
 
   // Fetch product data
   useEffect(() => {
@@ -162,11 +168,11 @@ const Product = () => {
 
   // Update the Back button to use the category if available
   const handleBackNavigation = () => {
-    if (window.history.length > 1) {
+    if (location.state?.fromStorefront && window.history.length > 1) {
       navigate(-1);
       return;
     }
-    navigate(categoryFromUrl ? `/?category=${encodeURIComponent(categoryFromUrl)}` : "/");
+    navigate(categoryFromUrl ? `/all-products?category=${encodeURIComponent(categoryFromUrl)}` : "/all-products");
   };
 
   if (loading) {

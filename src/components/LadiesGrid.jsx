@@ -6,14 +6,24 @@ import { useCart } from "../context/CartContext.jsx";
 import { getCachedProducts, getProducts } from "../data/productStore.js";
 import { rankProducts } from "../utils/personalizationRanking.js";
 import { recordAddToCart } from "../utils/personalizationStore.js";
+import { useLocation, useNavigationType } from "react-router-dom";
+import { getStorefrontGridState, useStorefrontGridState } from "../hooks/useStorefrontScrollRestoration.js";
 
 const LadiesGrid = () => {
+  const location = useLocation();
+  const navigationType = useNavigationType();
+  const savedGridState = getStorefrontGridState(location.key, "home-ladies");
   // State for products
   const [products, setProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.gender === "women")));
   const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
-  const [visibleCount, setVisibleCount] = useState(8);
-  const [visibleProducts, setVisibleProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.gender === "women")).slice(0, 8));
+  const [visibleCount, setVisibleCount] = useState(savedGridState.visibleCount || 8);
+  const [visibleProducts, setVisibleProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.gender === "women")).slice(0, savedGridState.visibleCount || 8));
   const [isAllLoaded, setIsAllLoaded] = useState(false);
+  useStorefrontGridState(location.key, "home-ladies", { visibleCount });
+  useEffect(() => {
+    const saved = getStorefrontGridState(location.key, "home-ladies").visibleCount;
+    if (navigationType === "POP" && saved) setVisibleCount(saved);
+  }, [location.key, navigationType]);
 
   // Modal state
   const [selectedProduct, setSelectedProduct] = useState(null);

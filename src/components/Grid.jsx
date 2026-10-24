@@ -4,14 +4,17 @@ import shareIcon from "../assets/share-icon.png";
 import ProductCard from "./ProductCard";
 import { getCachedProducts, getProducts } from "../data/productStore.js";
 import { useCart } from "../context/CartContext";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation, useNavigationType } from "react-router-dom";
 import { FiArrowLeft } from 'react-icons/fi';
-import { STOREFRONT_SCROLL_KEY } from "../hooks/useStorefrontScrollRestoration";
+import { getStorefrontGridState, useStorefrontGridState } from "../hooks/useStorefrontScrollRestoration.js";
 import { isDefaultGridSort, rankProducts } from "../utils/personalizationRanking.js";
 import { recordAddToCart } from "../utils/personalizationStore.js";
 
 const Grid = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigationType = useNavigationType();
+  const savedGridState = getStorefrontGridState(location.key, "all-products");
   const sortBy = searchParams.get("sort") || "newest";
   const [products, setProducts] = useState(() => {
     const cached = getCachedProducts();
@@ -20,7 +23,7 @@ const Grid = () => {
     return cached;
   });
   const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(savedGridState.page || 1);
   const [totalPages, setTotalPages] = useState(0);
   const itemsPerPage = 18;
 
@@ -28,6 +31,10 @@ const Grid = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  useStorefrontGridState(location.key, "all-products", { page: currentPage });
+  useEffect(() => {
+    if (navigationType === "POP") setCurrentPage(getStorefrontGridState(location.key, "all-products").page || 1);
+  }, [location.key, navigationType]);
 
   // Notification state
   const [notification, setNotification] = useState({
@@ -48,10 +55,12 @@ const Grid = () => {
   const maxPrice = searchParams.get("max_price") ? parseInt(searchParams.get("max_price")) : Infinity;
   const category = searchParams.get("category") || "";
   const searchQuery = searchParams.get("search") || "";
+  const filterSignature = searchParams.toString();
+  const previousFilterSignature = useRef(filterSignature);
 
   useEffect(() => {
     if (loading || !gridRef.current) return;
-    if (sessionStorage.getItem(STOREFRONT_SCROLL_KEY)) return;
+    if (sessionStorage.getItem("loris-storefront-scroll")) return;
     if (previousCategory.current === category) return;
 
     if (category) {
@@ -183,6 +192,10 @@ const Grid = () => {
   useEffect(() => {
     async function fetchProducts() {
       try {
+        if (getCachedProducts().length === 0) {
+          setLoading(true);
+          setProducts([]);
+        }
         const allProducts = await getProducts();
         const orderedProducts = sortBy === "price-high-to-low"
           ? [...allProducts].filter((product) => product.price !== undefined).sort((a, b) => Number(b.price) - Number(a.price))
@@ -276,9 +289,11 @@ const Grid = () => {
     const total = Math.ceil(filteredProducts.length / itemsPerPage);
     setTotalPages(total);
 
-    // Reset to page 1 when filters change
-    setCurrentPage(1);
-  }, [filteredProducts.length]);
+    if (previousFilterSignature.current !== filterSignature) {
+      previousFilterSignature.current = filterSignature;
+      setCurrentPage(1);
+    }
+  }, [filteredProducts.length, filterSignature]);
 
   // Calculate which products to display based on current page
   const startIndex = (currentPage - 1) * itemsPerPage;

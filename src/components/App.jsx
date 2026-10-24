@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import emailjs from '@emailjs/browser';
 import { CartProvider } from "../context/CartContext";
 import "../styles/App.css";
@@ -22,7 +22,7 @@ import ProtectedRoute from "../components/ProtectedRoute.jsx";
 function App() {
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if ("scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
     }

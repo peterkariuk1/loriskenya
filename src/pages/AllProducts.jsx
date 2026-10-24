@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigationType } from "react-router-dom"
 import Header from '../components/Header.jsx'
 import Filters from '../components/Filters.jsx'
 import Grid from '../components/Grid.jsx'
@@ -8,7 +8,8 @@ import { useStorefrontScrollRestoration } from "../hooks/useStorefrontScrollRest
 
 function AllProducts() {
   const location = useLocation();
-  useStorefrontScrollRestoration(`${location.pathname}${location.search}`);
+  const navigationType = useNavigationType();
+  useStorefrontScrollRestoration(location, navigationType);
 
   return (
     <>

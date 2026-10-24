@@ -359,13 +359,15 @@
   text-decoration: none;
 }
 
-/* WhatsApp button style */
-.checkout-button[orderMethod="whatsapp"] {
-  background-color: #25d366;
+/* WhatsApp call to action */
+.checkout-button-whatsapp {
+  background-color: #128c4a;
+  color: #fff;
 }
 
-.checkout-button[orderMethod="whatsapp"]:hover {
-  background-color: #1db055;
+.checkout-button.checkout-button-whatsapp:hover:not(:disabled) {
+  background-color: #0e713c;
+  color: #fff;
 }
 
 /* Responsive styles */

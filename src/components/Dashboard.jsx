@@ -4,7 +4,7 @@ import {
   FiArrowRight, FiEye, FiAlertCircle, FiCalendar, FiLoader, FiRefreshCw
 } from 'react-icons/fi';
 import { db } from '../../firebase/firebaseConfig';
-import { collection, getDocs, limit, orderBy, query, Timestamp, where } from 'firebase/firestore';
+import { collection, getDocs, limit, onSnapshot, orderBy, query, Timestamp, where } from 'firebase/firestore';
 import { getStockQuantity } from '../utils/inventory';
 import { aggregateTodayPosSales, nairobiDayBounds } from '../utils/todayPosSales.js';
 import '../styles/dashboard.css';
@@ -58,12 +58,30 @@ const Dashboard = ({ onNavigateToTab }) => {
 
   useEffect(() => {
     refreshTodaySales();
+    const recentOrdersQuery = query(collection(db, 'orders'), orderBy('createdAt', 'desc'), limit(5));
+    const unsubscribeRecentOrders = onSnapshot(recentOrdersQuery, (snapshot) => {
+      setRecentOrders(snapshot.docs.map((orderDoc) => {
+        const order = { id: orderDoc.id, ...orderDoc.data() };
+        const status = order.status || 'confirmed';
+        return {
+          id: order.orderNumber || order.id,
+          customer: order.shippingAddress?.fullName || order.customerName || 'Anonymous',
+          date: order.createdAt?.toDate ? order.createdAt.toDate().toISOString().split('T')[0] : (order.createdAt ? new Date(order.createdAt).toISOString().split('T')[0] : 'Unknown'),
+          total: `KSh ${(parseFloat(order.total) || 0).toLocaleString()}`,
+          status: status.charAt(0).toUpperCase() + status.slice(1)
+        };
+      }));
+    }, (err) => {
+      console.error('Error listening for recent orders:', err);
+    });
+
     getDocs(query(collection(db, 'stock_movements'), orderBy('createdAt', 'desc'), limit(10)))
       .then((snapshot) => setStockMovements(snapshot.docs.map((item) => ({ id: item.id, ...item.data() }))))
       .catch((err) => {
         console.error('Error fetching stock movements:', err);
         setMovementsError('Could not load recent stock movements.');
       });
+    return unsubscribeRecentOrders;
   }, []);
 
   useEffect(() => {
@@ -86,15 +104,6 @@ const Dashboard = ({ onNavigateToTab }) => {
         const totalRevenue = ordersData.reduce((sum, order) => {
           return sum + (parseFloat(order.total) || 0);
         }, 0);
-
-        // Get recent orders (last 5)
-        const recentOrdersData = ordersData.slice(0, 5).map(order => ({
-          id: order.orderNumber || order.id,
-          customer: order.shippingAddress?.fullName || order.customerName || 'Anonymous',
-          date: order.createdAt?.toDate ? order.createdAt.toDate().toISOString().split('T')[0] : (order.createdAt ? new Date(order.createdAt).toISOString().split('T')[0] : 'Unknown'),
-          total: `KSh ${parseFloat(order.total).toLocaleString()}`,
-          status: order.status || 'Processing'
-        }));
 
         // Fetch customers
         const customersQuery = query(
@@ -193,7 +202,6 @@ const Dashboard = ({ onNavigateToTab }) => {
           products: productsCount
         });
 
-        setRecentOrders(recentOrdersData);
         setTopProducts(topProductsData);
         setAlerts(alertsData);
 

@@ -414,7 +414,7 @@ const Checkout = () => {
           )}
 
           <button
-            className="checkout-button"
+            className={`checkout-button ${orderMethod === "whatsapp" ? "checkout-button-whatsapp" : ""}`}
             onClick={handleCheckout}
             disabled={isProcessing}
           >

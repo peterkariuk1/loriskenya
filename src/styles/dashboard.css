@@ -350,6 +350,7 @@
 }
 .dashboard-extra-grid {
   align-items: start;
+  grid-template-columns: minmax(0, 1fr);
   margin-top: 24px;
 }
 

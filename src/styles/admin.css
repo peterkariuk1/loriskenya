@@ -92,9 +92,10 @@
 
 .logo {
   margin: 0;
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 28px;
+  font-weight: 300;
   white-space: nowrap;
+  color: #f9fafb;
 }
 
 .collapse-btn {

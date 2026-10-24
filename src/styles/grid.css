@@ -288,6 +288,7 @@
 
 .card-add-to-cart:hover:not(:disabled) {
   background: var(--palette-dark-gray);
+  color: var(--color-text-on-dark, #fff);
 }
 
 .product-card button:focus-visible {

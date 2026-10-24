@@ -17,9 +17,8 @@ import newsletterVideo from "../assets/loris_footer.mp4";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
 
-const shopCoordinates = "-1.2812723,36.8185782";
-const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${shopCoordinates}`;
-const mapsEmbedUrl = `https://www.google.com/maps?q=${shopCoordinates}&z=17&output=embed`;
+const mapsUrl = "https://maps.app.goo.gl/ML8vxdWWTG1qKRA96";
+const mapsEmbedUrl = "https://www.google.com/maps?cid=5377525608373103085&output=embed";
 
 const Footer = () => {
   const [email, setEmail] = useState("");

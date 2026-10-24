@@ -201,6 +201,7 @@
 
 .add-to-cart-btn:hover {
   background-color: var(--palette-dark-gray);
+  color: var(--color-text-on-dark, #fff);
 }
 
 /* Share button */

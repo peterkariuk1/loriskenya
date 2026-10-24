@@ -189,7 +189,7 @@ const Admin = () => {
               <Link to="/">
                 <img src={logoImage} alt="Loris Kenya" className="sidebar-logo" />
               </Link>
-              <h1 className="logo">Admin</h1>
+              <h1 className="logo">POS</h1>
             </div>
 
             {/* Mobile close button */}

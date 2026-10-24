@@ -382,139 +382,139 @@ const Header = () => {
   return (
     <>
       <nav ref={headerRef} className="header" aria-label="Main navigation">
-      <Link to="/">
-        <img className="loris-logo" src={logoImage} alt="Loris Logo" />
-      </Link>
+        <Link to="/">
+          <img className="loris-logo" src={logoImage} alt="Loris Logo" />
+        </Link>
 
-      <div className="searchbox">
-        <input
-          ref={searchInputRef}
-          type="text"
-          className="search-input"
-          autoComplete="off"
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          onFocus={() => inputValue.trim().length > 1 && setShowSuggestions(true)}
-        />
-        {inputValue === "" && (
-          <span className={`placeholder-text ${animate}`}>
-            {placeholders[index]}
-          </span>
-        )}
-        <button
-          type="button"
-          className="search-button-container"
-          aria-label="Search"
-          onClick={() => handleSearch()}
-        >
-          <img src={searchIcon} alt="" />
-        </button>
+        <div className="searchbox">
+          <input
+            ref={searchInputRef}
+            type="text"
+            className="search-input"
+            autoComplete="off"
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            onFocus={() => inputValue.trim().length > 1 && setShowSuggestions(true)}
+          />
+          {inputValue === "" && (
+            <span className={`placeholder-text ${animate}`}>
+              {placeholders[index]}
+            </span>
+          )}
+          <button
+            type="button"
+            className="search-button-container"
+            aria-label="Search"
+            onClick={() => handleSearch()}
+          >
+            <img src={searchIcon} alt="" />
+          </button>
 
-        {showSuggestions && (
-          <div className="search-suggestions" ref={suggestionsRef}>
-            {isLoading ? (
-              <div className="suggestion-loading">
-                <p>Loading suggestions...</p>
-              </div>
-            ) : suggestions.length > 0 ? (
-              <ul>
-                {suggestions.map((suggestion, index) => (
-                  <li
-                    key={`${suggestion.type}-${index}`}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                    className={suggestion.type === "category" ? "category-suggestion" : ""}
-                  >
-                    {suggestion.type === "category" ? (
-                      <>
-                        <span className="suggestion-icon">🏷️</span>
-                        <span>Category: {suggestion.name}</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="suggestion-icon">🔍</span>
-                        <span className="product-suggestion">
-                          <strong>{suggestion.name}</strong>
-                          {suggestion.category && <small>{suggestion.category}</small>}
-                        </span>
-                      </>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            ) : recentSearches.length > 0 ? (
-              <div className="recent-searches">
-                <h4>Recent Searches</h4>
+          {showSuggestions && (
+            <div className="search-suggestions" ref={suggestionsRef}>
+              {isLoading ? (
+                <div className="suggestion-loading">
+                  <p>Loading suggestions...</p>
+                </div>
+              ) : suggestions.length > 0 ? (
                 <ul>
-                  {recentSearches.map((term, index) => (
-                    <li key={index} onClick={() => handleSearch(term)}>
-                      <span className="suggestion-icon">⏱️</span>
-                      <span>{term}</span>
+                  {suggestions.map((suggestion, index) => (
+                    <li
+                      key={`${suggestion.type}-${index}`}
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      className={suggestion.type === "category" ? "category-suggestion" : ""}
+                    >
+                      {suggestion.type === "category" ? (
+                        <>
+                          <span className="suggestion-icon">🏷️</span>
+                          <span>Category: {suggestion.name}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="suggestion-icon">🔍</span>
+                          <span className="product-suggestion">
+                            <strong>{suggestion.name}</strong>
+                            {suggestion.category && <small>{suggestion.category}</small>}
+                          </span>
+                        </>
+                      )}
                     </li>
                   ))}
                 </ul>
-              </div>
-            ) : (
-              <p className="no-suggestions">No matches found</p>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="right">
-        <div className="nav-profile-container" ref={profileDropdownRef}>
-          <button
-            type="button"
-            className="profile-icon-wrapper" 
-            aria-label={isAuthenticated ? "Open account menu" : "Sign in"}
-            onClick={() => isAuthenticated ? setShowProfileMenu(!showProfileMenu) : navigate("/login")}
-          >
-            <img src={profileIcon} alt="" />
-            {isAuthenticated && <span className="auth-indicator" />}
-          </button>
-          
-          {isAuthenticated && showProfileMenu && (
-            <div className="profile-dropdown">
-              <div className="user-info">
-                <span className="user-email">{currentUser.email}</span>
-              </div>
-              
-              <div className="dropdown-divider"></div>
-              
-              <div className="dropdown-menu">
-                <Link to="/profile" className="dropdown-item">
-                  <FiUser /> My Account
-                </Link>
-                
-                <Link to="/orders" className="dropdown-item">
-                  <FiShoppingBag /> My Orders
-                </Link>
-                
-                {isAdmin && (
-                  <Link to="/admin" className="dropdown-item admin-link">
-                    <FiSettings /> Admin Dashboard
-                  </Link>
-                )}
-                
-                <button onClick={handleLogout} className="dropdown-item logout-btn">
-                  <FiLogOut /> Logout
-                </button>
-              </div>
+              ) : recentSearches.length > 0 ? (
+                <div className="recent-searches">
+                  <h4>Recent Searches</h4>
+                  <ul>
+                    {recentSearches.map((term, index) => (
+                      <li key={index} onClick={() => handleSearch(term)}>
+                        <span className="suggestion-icon">⏱️</span>
+                        <span>{term}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p className="no-suggestions">No matches found</p>
+              )}
             </div>
           )}
         </div>
-        
-        <Link to="/checkout" aria-label={`Shopping cart, ${cartItemCount} items`}>
-          <div className="cart-container">
-            <img ref={cartIconRef} src={cartIcon} alt="" />
-            {cartItemCount > 0 && (
-              <div className="cart-counter-container">
-                <p>{cartItemCount > 999 ? "999+" : cartItemCount}</p>
+
+        <div className="right">
+          <div className="nav-profile-container" ref={profileDropdownRef}>
+            <button
+              type="button"
+              className="profile-icon-wrapper"
+              aria-label={isAuthenticated ? "Open account menu" : "Sign in"}
+              onClick={() => isAuthenticated ? setShowProfileMenu(!showProfileMenu) : navigate("/login")}
+            >
+              <img src={profileIcon} alt="" />
+              {isAuthenticated && <span className="auth-indicator" />}
+            </button>
+
+            {isAuthenticated && showProfileMenu && (
+              <div className="profile-dropdown">
+                <div className="user-info">
+                  <span className="user-email">{currentUser.email}</span>
+                </div>
+
+                <div className="dropdown-divider"></div>
+
+                <div className="dropdown-menu">
+                  <Link to="/profile" className="dropdown-item">
+                    <FiUser /> My Account
+                  </Link>
+
+                  <Link to="/orders" className="dropdown-item">
+                    <FiShoppingBag /> My Orders
+                  </Link>
+
+                  {isAdmin && (
+                    <Link to="/admin" className="dropdown-item admin-link">
+                      <FiSettings />POS
+                    </Link>
+                  )}
+
+                  <button onClick={handleLogout} className="dropdown-item logout-btn">
+                    <FiLogOut /> Logout
+                  </button>
+                </div>
               </div>
             )}
           </div>
-        </Link>
-      </div>
+
+          <Link to="/checkout" aria-label={`Shopping cart, ${cartItemCount} items`}>
+            <div className="cart-container">
+              <img ref={cartIconRef} src={cartIcon} alt="" />
+              {cartItemCount > 0 && (
+                <div className="cart-counter-container">
+                  <p>{cartItemCount > 999 ? "999+" : cartItemCount}</p>
+                </div>
+              )}
+            </div>
+          </Link>
+        </div>
       </nav>
       <div className="header-spacer" aria-hidden="true" />
     </>

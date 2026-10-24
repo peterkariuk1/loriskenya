@@ -24,6 +24,8 @@ import {
 import { FaWhatsapp } from "react-icons/fa";
 import { BsCashCoin } from "react-icons/bs";
 import { MdOutlineSendToMobile } from "react-icons/md";
+import { FaCreditCard } from "react-icons/fa";
+
 
 
 
@@ -37,9 +39,9 @@ import { shouldIncludeReviewLink } from "../utils/reviewLink.js";
 import "../styles/sales.css";
 
 const paymentMethods = [
-  { value: "cash", label: "Cash", icon: <BsCashCoin/> },
-  { value: "mpesa", label: "M-PESA", icon: <MdOutlineSendToMobile/> },
-  { value: "card", label: "Card", icon: "💳" },
+  { value: "cash", label: "Cash", icon: <BsCashCoin /> },
+  { value: "mpesa", label: "M-PESA", icon: <MdOutlineSendToMobile /> },
+  { value: "card", label: "Card", icon: <FaCreditCard /> },
 ];
 
 const getStock = getStockQuantity;
@@ -65,7 +67,7 @@ function Sales() {
   const [newCustomerName, setNewCustomerName] = useState("");
   const [discountPercent, setDiscountPercent] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("cash");
-  const [whatsappReceipt, setWhatsappReceipt] = useState(false);
+  const [whatsappReceipt, setWhatsappReceipt] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [message, setMessage] = useState(null);
   const [lastSale, setLastSale] = useState(null);
@@ -197,41 +199,41 @@ function Sales() {
         cart.map((item) => getDoc(doc(db, "products", item.id)))
       );
       const authoritativeItems = productSnapshots.map((snapshot, index) => {
-          if (!snapshot.exists()) throw new Error("A product in this sale no longer exists.");
-          const data = snapshot.data();
-          const stock = getStock(data);
-          const quantity = cart[index].quantity;
-          if (stock < quantity) throw new Error(`${data.name} no longer has enough stock.`);
-          return {
-            id: snapshot.id,
-            name: data.name || cart[index].name,
-            category: data.category || "",
-            image: data.image || "",
-            price: Number(data.price) || 0,
-            quantity,
-            lineTotal: (Number(data.price) || 0) * quantity,
-          };
-        });
-        const authoritativeSubtotal = authoritativeItems.reduce((sum, item) => sum + item.lineTotal, 0);
-        const authoritativeDiscount = Math.min(100, Math.max(0, Number(discountPercent) || 0));
-        const authoritativeTotal = authoritativeSubtotal * (1 - authoritativeDiscount / 100);
-        const saleData = {
-          receiptNumber,
-          orderMethod: "pos",
-          items: authoritativeItems,
-          subtotal: authoritativeSubtotal,
-          discount: authoritativeSubtotal - authoritativeTotal,
-          discountPercent: authoritativeDiscount,
-          total: authoritativeTotal,
-          paymentMethod,
-          paymentStatus: "confirmed",
-          customerId: selectedCustomer?.id || null,
-          customerName: selectedCustomer ? `${selectedCustomer.firstName || ""} ${selectedCustomer.secondName || selectedCustomer.lastName || ""}`.trim() : "Walk-in",
-          customerPhone: normalizedPhone || null,
-          whatsappReceiptRequested: whatsappReceipt,
-          cashierId: auth.currentUser?.uid || null,
-          createdAt: serverTimestamp(),
+        if (!snapshot.exists()) throw new Error("A product in this sale no longer exists.");
+        const data = snapshot.data();
+        const stock = getStock(data);
+        const quantity = cart[index].quantity;
+        if (stock < quantity) throw new Error(`${data.name} no longer has enough stock.`);
+        return {
+          id: snapshot.id,
+          name: data.name || cart[index].name,
+          category: data.category || "",
+          image: data.image || "",
+          price: Number(data.price) || 0,
+          quantity,
+          lineTotal: (Number(data.price) || 0) * quantity,
         };
+      });
+      const authoritativeSubtotal = authoritativeItems.reduce((sum, item) => sum + item.lineTotal, 0);
+      const authoritativeDiscount = Math.min(100, Math.max(0, Number(discountPercent) || 0));
+      const authoritativeTotal = authoritativeSubtotal * (1 - authoritativeDiscount / 100);
+      const saleData = {
+        receiptNumber,
+        orderMethod: "pos",
+        items: authoritativeItems,
+        subtotal: authoritativeSubtotal,
+        discount: authoritativeSubtotal - authoritativeTotal,
+        discountPercent: authoritativeDiscount,
+        total: authoritativeTotal,
+        paymentMethod,
+        paymentStatus: "confirmed",
+        customerId: selectedCustomer?.id || null,
+        customerName: selectedCustomer ? `${selectedCustomer.firstName || ""} ${selectedCustomer.secondName || selectedCustomer.lastName || ""}`.trim() : "Walk-in",
+        customerPhone: normalizedPhone || null,
+        whatsappReceiptRequested: whatsappReceipt,
+        cashierId: auth.currentUser?.uid || null,
+        createdAt: serverTimestamp(),
+      };
       await Promise.all(authoritativeItems.map((item, index) => {
         const previousStock = getStock(productSnapshots[index].data());
         return updateDoc(doc(db, "products", item.id), {
@@ -304,7 +306,7 @@ function Sales() {
         <div><h2>Sales / POS</h2><p>Process an in-store sale and keep inventory accurate.</p></div>
         <div className={`receipt-toggle-card ${whatsappReceipt ? "enabled" : ""}`}>
           <div>
-            <FaWhatsapp/>
+            <FaWhatsapp />
             <strong>WhatsApp Receipt</strong>
             <small>{whatsappReceipt ? "ON" : "OFF"}</small>
           </div>

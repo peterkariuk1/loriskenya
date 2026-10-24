@@ -15,10 +15,10 @@ const BestSellerGrid = () => {
   const navigationType = useNavigationType();
   const savedGridState = getStorefrontGridState(location.key, "home-best-sellers");
   // State for products
-  const [products, setProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.isBestSeller === true)));
+  const [products, setProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.isBestSeller === true).sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0)));
   const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
   const [visibleCount, setVisibleCount] = useState(savedGridState.visibleCount || 8);
-  const [visibleProducts, setVisibleProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.isBestSeller === true)).slice(0, savedGridState.visibleCount || 8));
+  const [visibleProducts, setVisibleProducts] = useState(() => rankProducts(getCachedProducts().filter((product) => product.isBestSeller === true).sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0)).slice(0, savedGridState.visibleCount || 8));
   const [isAllLoaded, setIsAllLoaded] = useState(false);
   useStorefrontGridState(location.key, "home-best-sellers", { visibleCount });
   useEffect(() => {
@@ -48,7 +48,7 @@ const BestSellerGrid = () => {
         
         // Create a query against the "products" collection where isBestSeller is true
         const allProducts = await getProducts();
-        const bestSellerProducts = allProducts.filter((product) => product.isBestSeller === true);
+        const bestSellerProducts = allProducts.filter((product) => product.isBestSeller === true).sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
         
         const rankedProducts = rankProducts(bestSellerProducts);
         setProducts(rankedProducts);

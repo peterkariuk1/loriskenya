@@ -343,7 +343,7 @@ const Grid = () => {
 
   // Calculate which products to display based on current page
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const rankedProducts = isDefaultGridSort({ sortBy, searchQuery, category })
+  const rankedProducts = isDefaultGridSort({ sortBy, searchQuery, category, minPrice, maxPrice })
     ? rankProducts(filteredProducts)
     : filteredProducts;
   const visibleProducts = rankedProducts.slice(startIndex, startIndex + itemsPerPage);

@@ -3,6 +3,7 @@ import {
   ADD_TO_CART_WEIGHT,
   BEST_SELLER_BOOST,
   CLICK_WEIGHT,
+  IN_STOCK_BONUS,
   MIN_WEIGHTED_EVENTS,
 } from "./personalizationConfig.js";
 import { getInterestSnapshot } from "./personalizationStore.js";
@@ -57,15 +58,23 @@ export const getSectionOrder = (snapshot = getInterestSnapshot()) => {
     .map(({ section }) => section);
 };
 
-export const rankProducts = (products, snapshot = getInterestSnapshot()) => {
-  if (!Array.isArray(products) || !hasEnoughInterest(snapshot)) return products;
+const isAvailable = (product) => product?.inStock !== false && Number(product?.stockQuantity) > 0;
+
+const prioritizeAvailability = (products) => [
+  ...products.filter(isAvailable),
+  ...products.filter((product) => !isAvailable(product)),
+];
+
+export const rankProducts = (products, snapshot = getInterestSnapshot(), { availabilityPriority = true } = {}) => {
+  if (!Array.isArray(products)) return products;
+  if (!hasEnoughInterest(snapshot)) return availabilityPriority ? prioritizeAvailability(products) : products;
 
   const events = snapshot.products || {};
   const tasteCandidates = Object.entries(events)
     .map(([id, event]) => ({ product: event, weight: eventWeight(event), id }))
     .filter(({ product, weight }) => weight > 0 && product.vv === VECTOR_VERSION && isUsableVector(product.v));
   const vectorLength = tasteCandidates[0]?.product.v.length;
-  if (!vectorLength) return products;
+  if (!vectorLength) return availabilityPriority ? prioritizeAvailability(products) : products;
 
   const taste = Array(vectorLength).fill(0);
   let totalWeight = 0;
@@ -74,9 +83,9 @@ export const rankProducts = (products, snapshot = getInterestSnapshot()) => {
     product.v.forEach((value, index) => { taste[index] += value * weight; });
     totalWeight += weight;
   });
-  if (!totalWeight) return products;
+  if (!totalWeight) return availabilityPriority ? prioritizeAvailability(products) : products;
   const tasteMagnitude = Math.sqrt(taste.reduce((total, value) => total + value * value, 0));
-  if (!tasteMagnitude) return products;
+  if (!tasteMagnitude) return availabilityPriority ? prioritizeAvailability(products) : products;
   const tasteVector = taste.map((value) => value / tasteMagnitude);
 
   return products
@@ -84,16 +93,20 @@ export const rankProducts = (products, snapshot = getInterestSnapshot()) => {
       const similarity = product.vecVersion === VECTOR_VERSION
         ? cosineSimilarity(tasteVector, product.vec)
         : null;
-      const available = product.inStock !== false && Number(product.stockQuantity) > 0;
       return {
         product,
         index,
         score: similarity === null ? null : similarity + (product.isBestSeller ? BEST_SELLER_BOOST : 0)
-          + (available ? 0 : -1),
+          + (availabilityPriority && isAvailable(product) ? IN_STOCK_BONUS : 0),
       };
     })
     .sort((left, right) => {
-      if (left.score === null && right.score === null) return left.index - right.index;
+      if (left.score === null && right.score === null) {
+        if (availabilityPriority && isAvailable(left.product) !== isAvailable(right.product)) {
+          return isAvailable(left.product) ? -1 : 1;
+        }
+        return left.index - right.index;
+      }
       if (left.score === null) return 1;
       if (right.score === null) return -1;
       return right.score - left.score || left.index - right.index;
@@ -101,6 +114,6 @@ export const rankProducts = (products, snapshot = getInterestSnapshot()) => {
     .map(({ product }) => product);
 };
 
-export const isDefaultGridSort = ({ sortBy = "newest", searchQuery = "" } = {}) => (
-  sortBy === "newest" && !searchQuery
+export const isDefaultGridSort = ({ sortBy = "newest", searchQuery = "", category = "", minPrice = 0, maxPrice = Infinity } = {}) => (
+  sortBy === "newest" && !searchQuery && !category && Number(minPrice) <= 0 && maxPrice === Infinity
 );

@@ -5,4 +5,5 @@ export const MIN_WEIGHTED_EVENTS = 3;
 export const CLICK_WEIGHT = 1;
 export const ADD_TO_CART_WEIGHT = 3;
 export const BEST_SELLER_BOOST = 0.05;
+export const IN_STOCK_BONUS = 0.1;
 export const STORE_WRITE_DEBOUNCE_MS = 1000;

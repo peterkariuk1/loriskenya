@@ -348,3 +348,38 @@
     display: none;
   }
 }
+.dashboard-extra-grid {
+  align-items: start;
+  margin-top: 24px;
+}
+
+.today-sales-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 12px 0 18px;
+}
+
+.today-sales-stats div,
+.payment-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.today-sales-stats span,
+.today-sales-card small {
+  color: #777;
+  font-size: 12px;
+}
+
+.today-sales-stats strong { font-size: 20px; }
+.payment-breakdown { border-top: 1px solid #eee; padding-top: 12px; margin-bottom: 12px; }
+.payment-breakdown span { font-size: 13px; }
+.dashboard-inline-error { color: #a22; }
+.stock-movements-card { min-width: 0; }
+.stock-movements-card .table-container { overflow-x: auto; }
+
+@media (max-width: 650px) {
+  .today-sales-stats { grid-template-columns: 1fr; }
+}

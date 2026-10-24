@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {
   FiDollarSign, FiShoppingCart, FiUsers, FiPackage,
-  FiArrowRight, FiEye, FiAlertCircle, FiCalendar, FiLoader
+  FiArrowRight, FiEye, FiAlertCircle, FiCalendar, FiLoader, FiRefreshCw
 } from 'react-icons/fi';
 import { db } from '../../firebase/firebaseConfig';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, limit, orderBy, query, Timestamp, where } from 'firebase/firestore';
 import { getStockQuantity } from '../utils/inventory';
+import { aggregateTodayPosSales, nairobiDayBounds } from '../utils/todayPosSales.js';
 import '../styles/dashboard.css';
 
 const Dashboard = ({ onNavigateToTab }) => {
@@ -21,12 +22,49 @@ const Dashboard = ({ onNavigateToTab }) => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [todaySales, setTodaySales] = useState(null);
+  const [salesLoading, setSalesLoading] = useState(false);
+  const [salesError, setSalesError] = useState(null);
+  const [salesUpdatedAt, setSalesUpdatedAt] = useState(null);
+  const [stockMovements, setStockMovements] = useState([]);
+  const [movementsError, setMovementsError] = useState(null);
+
+  const refreshTodaySales = async () => {
+    setSalesLoading(true);
+    setSalesError(null);
+    try {
+      const { start, end } = nairobiDayBounds();
+      const snapshot = await getDocs(query(
+        collection(db, 'orders'),
+        where('createdAt', '>=', Timestamp.fromDate(start)),
+        where('createdAt', '<', Timestamp.fromDate(end))
+      ));
+      const sales = aggregateTodayPosSales(snapshot.docs.map((item) => ({ id: item.id, ...item.data() })));
+      setTodaySales(sales);
+      setSalesUpdatedAt(new Date());
+    } catch (err) {
+      console.error('Error fetching POS sales today:', err);
+      setSalesError('Could not load today’s POS sales. Refresh to try again.');
+    } finally {
+      setSalesLoading(false);
+    }
+  };
 
   // Get formatted date for the header
   const getCurrentDate = () => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return new Date().toLocaleDateString('en-US', options);
   };
+
+  useEffect(() => {
+    refreshTodaySales();
+    getDocs(query(collection(db, 'stock_movements'), orderBy('createdAt', 'desc'), limit(10)))
+      .then((snapshot) => setStockMovements(snapshot.docs.map((item) => ({ id: item.id, ...item.data() }))))
+      .catch((err) => {
+        console.error('Error fetching stock movements:', err);
+        setMovementsError('Could not load recent stock movements.');
+      });
+  }, []);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -242,6 +280,35 @@ const Dashboard = ({ onNavigateToTab }) => {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="dashboard-grid dashboard-extra-grid">
+        <section className="dashboard-card today-sales-card">
+          <div className="card-header">
+            <h3>POS Sales Today</h3>
+            <button className="view-all-btn" onClick={refreshTodaySales} disabled={salesLoading} aria-label="Refresh POS sales">
+              <FiRefreshCw className={salesLoading ? 'spinner' : ''} /> Refresh
+            </button>
+          </div>
+          {salesError ? <p className="dashboard-inline-error" role="alert">{salesError}</p> : salesLoading && !todaySales ? <p>Loading sales…</p> : todaySales && <>
+            <div className="today-sales-stats">
+              <div><span>Revenue received</span><strong>KSh {todaySales.revenue.toLocaleString()}</strong></div>
+              <div><span>Transactions</span><strong>{todaySales.transactions}</strong></div>
+              <div><span>Average sale</span><strong>KSh {todaySales.averageSale.toLocaleString(undefined, { maximumFractionDigits: 2 })}</strong></div>
+            </div>
+            {todaySales.transactions === 0 && <p className="empty-state">No qualifying POS sales today.</p>}
+            <div className="payment-breakdown"><strong>By payment method</strong>{Object.entries(todaySales.paymentBreakdown).length ? Object.entries(todaySales.paymentBreakdown).map(([method, amount]) => <span key={method}>{method.toUpperCase()}: KSh {amount.toLocaleString()}</span>) : <span>—</span>}</div>
+            {todaySales.unclassified.length > 0 && <p className="dashboard-inline-error">{todaySales.unclassified.length} POS order(s) could not be classified.</p>}
+            <small>Updated {salesUpdatedAt?.toLocaleTimeString('en-KE') || '—'} (Africa/Nairobi)</small>
+          </>}
+        </section>
+        <section className="dashboard-card stock-movements-card">
+          <div className="card-header"><h3>Recent Stock Movements</h3></div>
+          {movementsError ? <p className="dashboard-inline-error" role="alert">{movementsError}</p> : stockMovements.length === 0 ? <p className="empty-state">No stock movements recorded.</p> : <div className="table-container"><table className="orders-table"><thead><tr><th>Time</th><th>Product</th><th>Change</th><th>Type</th><th>Stock</th><th>Note / who</th></tr></thead><tbody>{stockMovements.map((movement) => {
+            const date = movement.createdAt?.toDate ? movement.createdAt.toDate() : new Date(movement.createdAt || 0);
+            return <tr key={movement.id}><td>{Number.isNaN(date.getTime()) ? '—' : date.toLocaleString('en-KE')}</td><td><a href={`/product/?pid=${encodeURIComponent(movement.productId || '')}`}>{movement.productName || movement.productId || 'Product'}</a></td><td>{Number(movement.change) > 0 ? '+' : ''}{movement.change}</td><td>{movement.type || '—'}</td><td>{movement.previousQty} → {movement.newQty}</td><td>{movement.note || '—'}{movement.createdBy ? ` · ${movement.createdBy}` : ''}</td></tr>;
+          })}</tbody></table></div>}
+        </section>
       </div>
 
       <div className="dashboard-grid">
